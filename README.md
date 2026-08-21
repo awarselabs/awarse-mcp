@@ -1,6 +1,6 @@
-# AWARSE: Autonomous Playwright Self-Healing Selector Engine
+# AWARSE: Autonomous Playwright Self-Healing Selector Engine (MCP Server)
 
-AWARSE is a production-grade **Autonomous Playwright Self-Healing Selector Engine** operating as a Model Context Protocol (MCP) server. It intercepts broken browser locators at runtime, analyzes the target DOM snapshot using Gemini via Structured Outputs, verifies selector candidates in a sandboxed headless browser, and hot-patches the locator for the client.
+AWARSE is a production-grade **Autonomous Playwright Self-Healing Selector Engine** operating as a Model Context Protocol (MCP) server. It catches failing Playwright locators at runtime, analyzes token-optimized **ARIA snapshots** via Gemini 2.5 Pro / Flash, verifies healed expressions in a sandboxed headless browser, and generates AST-based source code patches to hot-fix the spec files on disk.
 
 ---
 
@@ -9,52 +9,65 @@ AWARSE is a production-grade **Autonomous Playwright Self-Healing Selector Engin
 ```mermaid
 sequenceDiagram
     autonumber
-    participant Client as Playwright Test / Agent
-    participant MCP as AWARSE MCP Server
-    participant Gemini as Gemini API (2.5 Pro / 2.0 Flash)
+    participant Runner as Playwright Test Runner
+    participant Fixture as smartFixture (Client Hook)
+    participant Server as AWARSE MCP Server
+    participant Gemini as Gemini API (2.5 Pro / Flash)
     participant Sandbox as Headless Playwright Sandbox
+    participant Patcher as AST / Text Patcher
 
-    Client->>Client: Interaction fails (Timeout / Element Not Found)
-    Client->>MCP: Call tool: heal_selector(broken, error, DOM, URL)
-    Note over MCP: Clean DOM (Strip scripts, styles, links, SVG paths, base64)
-    MCP->>Gemini: Request Healed Selector (Structured Output, Temp 0.1)
-    Gemini-->>MCP: Return JSON (proposed_selector, rationale, fallback_selectors)
+    Runner->>Runner: Locator fails (Timeout / Assertion Error)
+    Runner-->>Fixture: Catch Exception + stack trace
+    Note over Fixture: Extract spec file coordinates (file, line, col)
+    Fixture->>Fixture: Capture page.ariaSnapshot({ boxes: true })
+    Fixture->>Server: Call heal_selector(broken, error, ARIA, URL, file, line, col)
     
-    loop Verify Candidate Selectors
-        MCP->>Sandbox: Load Clean DOM (set_content)
-        MCP->>Sandbox: Evaluate locator(candidate).count()
-        alt Candidate Count == 1
-            Sandbox-->>MCP: Match Unique!
-            Note over MCP: verification_status = "verified_unique"
-        else Candidate Count > 1
-            Sandbox-->>MCP: Match Ambiguous
-            Note over MCP: Try next fallback candidate
-        else Candidate Count == 0
-            Sandbox-->>MCP: Match Failed
-            Note over MCP: Try next fallback candidate
-        end
+    Server->>Gemini: Request Healed Locator (response_schema, temp 0.1)
+    Note over Gemini: Prioritize accessibility (getByRole, getByTestId, locator.or())
+    Gemini-->>Server: Return JSON (proposed_playwright_call, fallback_expression, rationale, type)
+    
+    Server->>Sandbox: Load ARIA snapshot / DOM content
+    Note over Sandbox: Translate TS selectors to Python syntax if evaluating on python host
+    Server->>Sandbox: Evaluate locator count & visibility
+    alt Verification Success (count == 1 & visible)
+        Sandbox-->>Server: Selector verified!
+        Note over Server: status = "verified_unique"
+    else Verification Failed
+        Note over Server: Evaluate fallback_expression
+        Sandbox-->>Server: Status = "failed" or "ambiguous_match"
     end
 
-    MCP-->>Client: Return HealedSelectorResponse (proposed, rational, status)
-    Client->>Client: Retry interaction using patched selector
+    alt status == "verified_unique" AND coordinates provided
+        Server->>Patcher: Invoke patch_source_file(file, line, col, healed_locator)
+        Note over Patcher: Parse AST (Python AST / Babel JS) & rewrite spec call
+        Patcher-->>Server: Patch completed on disk
+    end
+
+    Server-->>Fixture: Return HealedSelectorResponse (healed_locator, status)
+    Fixture->>Fixture: Dynamically evaluate healed locator via eval()
+    Fixture->>Runner: Re-execute action and resume test execution
 ```
 
 ---
 
-## 🚀 Key Features
+## 🚀 Key Architectural Features
 
-* **DOM Sanitizer & Token Optimizer**: Discards all `<script>`, `<style>`, `<link>`, and comment blocks. Replaces bloated inline base64 images and strips verbose `<svg>` XML paths to minimize LLM token consumption and context window latency by **80%–90%**.
-* **Gemini Orchestration Layer**: Utilizes the modern `google-genai` SDK and leverages **Structured Outputs** via Pydantic model validation with low temperature (`0.1`) for highly deterministic locating strategies (prioritizing accessibility roles, `data-testid`, and stable text anchors).
-* **Sandboxed Headless Verification Loop**: Automatically verifies selector uniqueness (`count === 1`) inside an ephemeral, sandboxed Playwright Chromium page using the actual DOM state before returning the selector.
-* **Dual Transport Support**: Exposes standard I/O (`stdio`) for local IDE integration and streamable HTTP/SSE for remote pipelines or shared infrastructure.
-* **Seamless Client Fixtures**: Ready-to-inject fixtures for both Playwright TypeScript and Python test suites.
+* **Compact ARIA Snapshot Ingestion**: Utilizes Playwright's native `page.ariaSnapshot({ boxes: true })` API to capture clean, token-efficient YAML accessibility tree layouts instead of bloated raw HTML structure.
+* **Resilient Locator Generation**: Directs Gemini to produce modern Playwright locators mapped strictly to accessibility guidelines:
+  1. `page.getByRole()` matching accessibility labels and descriptions.
+  2. `page.getByTestId()`, `page.getByLabel()`, or `page.getByPlaceholder()`.
+  3. Chained fallback structures using `locator.or()`.
+  4. Brittle CSS/XPath locators as a last resort.
+* **Sandboxed Locator Evaluator**: Automatically evaluates and executes JS/TS Playwright locator call expressions dynamically inside a headless Playwright Chromium sandbox browser to guarantee element uniqueness (`count === 1`) and visibility.
+* **AST-Based Source Code Patching**: Includes a Python AST rewriter (using `ast` modules) and JavaScript/TypeScript rewriter (using `@babel/parser` / `@babel/traverse`) that locates the exact code coordinates of the failing locator in the source file on disk and overwrites it.
+* **Smart Playwright Client Hooks**: Includes dynamic fixtures for TypeScript and Python tests that capture error line/col locations from stack traces and run self-healing.
 
 ---
 
 ## ⚡ Quickstart
 
-### 1. Prerequisite Installations
-Ensure you have Python 3.11+ installed. We recommend using `uv`, a fast, modern Python package manager.
+### 1. Prerequisites
+Ensure you have Python 3.11+ and Node.js installed on your VM or runner.
 
 ```bash
 # Clone the repository
@@ -63,7 +76,7 @@ cd awarse-mcp
 ```
 
 ### 2. Configure Environment
-Create a `.env` file in the root of the project:
+Create a `.env` file in the root directory:
 ```env
 GEMINI_API_KEY="your-gemini-api-key"
 GEMINI_MODEL="gemini-2.5-pro"  # Defaults to gemini-2.5-pro
@@ -72,36 +85,35 @@ AWARSE_PORT=8000
 AWARSE_MOCK_HEAL=false          # Set to true for offline testing
 ```
 
-### 3. Install Dependencies & Playwright
+### 3. Install Dependencies
 ```bash
-# Using modern package management (uv)
+# Set up virtual environment and install python packages
 uv venv
 source venv/bin/activate
 uv pip install -r requirements.txt
 uv run playwright install chromium --with-deps
+
+# Optional: Install Babel for TS AST parsing (falls back to text-slice parser if missing)
+npm install @babel/parser @babel/traverse @babel/generator
 ```
 
-### 4. Running the MCP Server
-AWARSE can be executed in two transport modes:
-
+### 4. Run the MCP Server
+AWARSE supports dual transport channels:
 * **Local stdio mode (Default)**:
   ```bash
   uv run src/server/mcp_server.py
   ```
-* **Remote SSE mode**:
+* **Remote SSE mode (shared server)**:
   ```bash
   uv run src/server/mcp_server.py sse
   ```
 
 ---
 
-## ⚙️ MCP Client Integration
-
-Add AWARSE to your coding assistants by applying the configuration blocks below. Make sure to replace `/path/to/awarse-mcp` with your actual repository path.
+## ⚙️ MCP Client Configs
 
 ### Claude Desktop Configuration
-Add this to your `claude_desktop_config.json` (located at `~/.config/Claude/claude_desktop_config.json` on Linux/macOS or `%APPDATA%\Claude\claude_desktop_config.json` on Windows):
-
+Add this block to your local `claude_desktop_config.json`:
 ```json
 {
   "mcpServers": {
@@ -118,7 +130,7 @@ Add this to your `claude_desktop_config.json` (located at `~/.config/Claude/clau
 }
 ```
 
-### Cursor Configuration
+### Cursor Config
 Add this to your Cursor settings under **MCP** -> **Add New MCP Server**:
 * **Name**: `awarse-healer`
 * **Type**: `stdio`
@@ -128,41 +140,41 @@ Add this to your Cursor settings under **MCP** -> **Add New MCP Server**:
 
 ## 🛠️ Exposed MCP Tool: `heal_selector`
 
-Exposes the core healing tool to LLM agents:
+Invokes the AWARSE healing pipeline:
 
-### Input Schema
-* `broken_selector` (string, required): The CSS, XPath, or Role locator that failed.
-* `error_message` (string, required): The Playwright / Selenium timeout error details.
-* `dom_snapshot` (string, required): The captured HTML/DOM content.
-* `target_url` (string, optional): Contextual URL of the page.
+### Arguments Schema
+* `broken_selector` (string, required): The failing locator expression.
+* `error_message` (string, required): The error message details.
+* `dom_snapshot` (string, required): Compact YAML ARIA snapshot.
+* `target_url` (string, optional): Active URL context.
+* `file_path` (string, optional): Absolute path of the test file on disk.
+* `line_number` (integer, optional): The line number of the failing locator call.
+* `column_number` (integer, optional): The column number of the failing locator call.
 
 ### Output JSON Format
 ```json
 {
-  "proposed_selector": "button[data-testid='submit-btn']",
-  "confidence_score": 0.95,
-  "rationale": "The original '#submit-btn' ID attribute was removed during structural layout refactoring, but the accessibility text and data-testid tags remain stable.",
-  "fallback_selectors": [
-    "button:has-text('Submit')",
-    "role=button[name='Submit']"
-  ],
+  "proposed_playwright_call": "page.getByRole('button', { name: 'Submit' })",
+  "selector_type": "role",
+  "confidence_score": 0.98,
+  "rationale": "The original ID selector was removed during UI layout changes. The target button is uniquely identifiable by its accessible role and text label.",
+  "fallback_expression": "page.locator('#healed-submit-action-button')",
   "verification_status": "verified_unique"
 }
 ```
-*Note: `verification_status` can be `"verified_unique"`, `"ambiguous_match"`, or `"failed"`.*
 
 ---
 
 ## 🧪 Test Suite & Client Fixtures
 
-### Running Unit/Integration Tests
-Verify AWARSE's engine, DOM optimizer, and verifier sandbox by running the test suite:
+### Run Code Verification
+To run the full unit and integration test suite:
 ```bash
 # Run pytest tests
 PYTHONPATH=. uv run pytest tests/
 ```
 
-### Injecting into Playwright Suites
-We have included implementation templates showing how to hot-patch selectors dynamically at runtime inside the `examples/` directory:
-* **Playwright TypeScript (Page Fixture)**: See [examples/smartFixture.ts](examples/smartFixture.ts) (uses `@modelcontextprotocol/sdk` to query the AWARSE server over SSE).
-* **Playwright Python (Pytest Fixture)**: See [examples/smart_locator.py](examples/smart_locator.py) (uses `mcp` stdio client to spin up the local server).
+### Client Integration Templates
+Integrate AWARSE into your test runners using the templates in `examples/`:
+* **TypeScript Playwright Fixture**: See [examples/smartFixture.ts](examples/smartFixture.ts) (captures `ariaSnapshot`, parses the spec file stack trace, calls AWARSE, and patches the file).
+* **Python Playwright pytest Fixture**: See [examples/smart_locator.py](examples/smart_locator.py).

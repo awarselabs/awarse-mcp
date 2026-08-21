@@ -1,8 +1,11 @@
 import sys
+import atexit
+import asyncio
 from mcp.server.fastmcp import FastMCP
 from src.types import settings, HealedSelectorResponse
-from src.engine import sanitize_dom_snapshot, GeminiHealerClient
+from src.engine import GeminiHealerClient
 from src.sandbox import SandboxVerifier
+from src.ast import patch_source_file
 
 # Initialize FastMCP Server
 mcp = FastMCP("awarse-healer")
@@ -15,45 +18,48 @@ verifier = SandboxVerifier()
 async def heal_selector(
     broken_selector: str,
     error_message: str,
-    dom_snapshot: str,
-    target_url: str = None
+    dom_snapshot: str,  # represents ARIA tree snapshot
+    target_url: str = None,
+    file_path: str = None,
+    line_number: int = None,
+    column_number: int = None
 ) -> HealedSelectorResponse:
     """
-    MCP Tool to analyze a broken Playwright selector, sanitize the DOM snapshot,
-    query Gemini to identify replacement selector candidates, verify their uniqueness
-    in a sandboxed headless browser, and return a verified patch.
+    Exposes heal_selector MCP tool. Takes failed selector, error, ARIA layout,
+    evaluates candidates in Playwright sandbox, updates source file AST if coordinates provided.
     """
-    print(f"[MCP Tool] heal_selector invoked for selector '{broken_selector}'")
+    print(f"[MCP Tool] heal_selector invoked for locator '{broken_selector}'")
     
-    # 1. Sanitize DOM snapshot to save tokens
-    sanitized_dom = sanitize_dom_snapshot(dom_snapshot)
-    
-    # 2. Query Gemini for healed candidates
+    # 1. Query Gemini using the ARIA tree layout
     gemini_resp = await healer_client.get_healed_selector(
         broken_selector=broken_selector,
         error_message=error_message,
-        sanitized_dom=sanitized_dom,
+        dom_snapshot=dom_snapshot,
         target_url=target_url
     )
     
-    # 3. Verify selector candidates in sandbox
-    resolved_selector, verification_status = await verifier.verify_and_resolve_selector(
-        dom_snapshot=sanitized_dom,
-        proposed_selector=gemini_resp.proposed_selector,
-        fallback_selectors=gemini_resp.fallback_selectors
+    # 2. Verify locator expression inside the headless Playwright sandbox
+    resolved_locator, verification_status = await verifier.verify_and_resolve_locator(
+        dom_snapshot=dom_snapshot,
+        proposed_locator=gemini_resp.proposed_playwright_call,
+        fallback_expression=gemini_resp.fallback_expression
     )
     
-    # 4. Construct final response
+    # 3. If file path coordinates are provided and verification succeeds, apply AST/source code patch
+    if file_path and line_number is not None and verification_status == "verified_unique":
+        print(f"[MCP Server] Verification succeeded. Invoking AST patcher for {file_path}:{line_number}...")
+        # Note: resolved_locator is the verified call expression
+        patch_source_file(file_path, line_number, column_number, resolved_locator)
+    
+    # 4. Construct final response mapping
     return HealedSelectorResponse(
-        proposed_selector=resolved_selector,
+        proposed_playwright_call=resolved_locator,
+        selector_type=gemini_resp.selector_type,
         confidence_score=gemini_resp.confidence_score,
         rationale=gemini_resp.rationale,
-        fallback_selectors=gemini_resp.fallback_selectors,
+        fallback_expression=gemini_resp.fallback_expression,
         verification_status=verification_status
     )
-
-import atexit
-import asyncio
 
 def shutdown_server():
     """Cleanup hook to gracefully shut down the sandbox verifier browser."""
@@ -73,7 +79,6 @@ def shutdown_server():
 atexit.register(shutdown_server)
 
 if __name__ == "__main__":
-    # Handle command-line transport arguments
     if len(sys.argv) > 1 and sys.argv[1].lower() == "sse":
         print(f"[*] Starting AWARSE Healer Server in SSE Mode on http://{settings.awarse_host}:{settings.awarse_port}")
         mcp.run(

@@ -1,6 +1,56 @@
+import re
 import asyncio
 from playwright.async_api import async_playwright, Playwright, Browser, Page
 from src.types import settings
+
+def translate_locator_to_python(expr: str) -> str:
+    """
+    Translates a TS-style or Python-style Playwright locator expression into executable Python code.
+    Examples:
+      - "page.getByRole('button', { name: 'Sign In', exact: true })"
+        -> "page.get_by_role('button', name='Sign In', exact=True)"
+      - "page.locator('button').and(page.locator('.submit'))"
+        -> "page.locator('button').and_(page.locator('.submit'))"
+    """
+    # 1. Map standard JS camelCase locator methods to Python snake_case equivalents
+    methods_map = {
+        "getByRole": "get_by_role",
+        "getByText": "get_by_text",
+        "getByLabel": "get_by_label",
+        "getByPlaceholder": "get_by_placeholder",
+        "getByAltText": "get_by_alt_text",
+        "getByTitle": "get_by_title",
+        "getByTestId": "get_by_test_id",
+        "frameLocator": "frame_locator",
+        # Match standard method boundaries for logical operations
+        ".and(": ".and_(",
+        ".or(": ".or_(",
+    }
+    
+    out = expr
+    for ts_name, py_name in methods_map.items():
+        out = out.replace(ts_name, py_name)
+        
+    # 2. Convert JS-style options object literals { name: '...', exact: true } to Python kwargs
+    def object_replacer(match):
+        content = match.group(1)
+        # Extract pairs matching key: value where value is string, boolean, or number
+        items = re.findall(r'([a-zA-Z0-9_]+)\s*:\s*(\'[^\\\']*\'|"[^\\"]*"|true|false|[0-9.]+)', content)
+        pairs = []
+        for k, v in items:
+            if v == "true":
+                v = "True"
+            elif v == "false":
+                v = "False"
+            pairs.append(f"{k}={v}")
+        return ", ".join(pairs)
+
+    # Match inner braces { ... }
+    out = re.sub(r'\{\s*([^{}]+)\s*\}', object_replacer, out)
+    # Clean redundant commas that might have resulted from conversion
+    out = re.sub(r',\s*,', ',', out)
+    
+    return out
 
 class SandboxVerifier:
     def __init__(self):
@@ -25,90 +75,92 @@ class SandboxVerifier:
                 await self._playwright.stop()
                 self._playwright = None
 
-    async def verify_selector(self, dom_snapshot: str, selector: str) -> bool:
+    async def verify_locator_expression(self, dom_snapshot: str, expression: str) -> bool:
         """
-        Loads the DOM snapshot into a sandboxed page and checks if the selector is unique (count == 1).
+        Loads the DOM snapshot or ARIA snapshot into a sandboxed page and checks if the locator
+        expression is unique (count == 1) and visible.
         """
         if settings.awarse_mock_heal:
             # Under mock heal mode, simulate uniqueness check for verification target
-            return selector in ("#healed-submit-action-button", "#username")
+            return "Submit" in expression or "Username" in expression or "healed" in expression
 
         await self._ensure_browser()
         context = await self._browser.new_context()
         page = await context.new_page()
         try:
+            # Load sanitized DOM content
             await page.set_content(dom_snapshot)
             try:
-                count = await page.locator(selector).count()
-                return count == 1
+                py_expression = translate_locator_to_python(expression)
+                # Safely evaluate Playwright locator expression on sandboxed page
+                locator = eval(py_expression, {"page": page})
+                count = await locator.count()
+                if count == 1:
+                    # Check if the element is visible
+                    return await locator.is_visible()
+                return False
             except Exception as e:
-                print(f"[SandboxVerifier] Selector '{selector}' threw syntax error or failed count: {e}")
+                print(f"[SandboxVerifier] Locator evaluation failed for '{expression}' [py: '{py_expression}']: {e}")
                 return False
         finally:
             await page.close()
             await context.close()
 
-    async def verify_and_resolve_selector(
+    async def verify_and_resolve_locator(
         self,
         dom_snapshot: str,
-        proposed_selector: str,
-        fallback_selectors: list
+        proposed_locator: str,
+        fallback_expression: str
     ) -> tuple[str, str]:
         """
-        Evaluates the proposed selector and fallbacks.
-        Returns a tuple of (resolved_selector, status).
-        Statuses:
-        - "verified_unique": if one selector matched exactly 1 element.
-        - "ambiguous_match": if selectors match multiple elements.
-        - "failed": if no selectors match any elements.
+        Evaluates the proposed Playwright locator and the fallback expression.
+        Returns a tuple of (resolved_locator, status).
         """
         if settings.awarse_mock_heal:
             print("[SandboxVerifier] MOCK MODE ACTIVE: Bypassing browser verification, assuming verified_unique.")
-            return proposed_selector, "verified_unique"
+            return proposed_locator, "verified_unique"
 
-        # 1. Try proposed selector
-        print(f"[SandboxVerifier] Verifying proposed selector: '{proposed_selector}'")
-        if await self.verify_selector(dom_snapshot, proposed_selector):
-            return proposed_selector, "verified_unique"
+        # 1. Try proposed locator
+        print(f"[SandboxVerifier] Verifying proposed locator: '{proposed_locator}'")
+        if await self.verify_locator_expression(dom_snapshot, proposed_locator):
+            return proposed_locator, "verified_unique"
         
         # Get count for classification
         proposed_count = 0
         try:
-            proposed_count = await self._get_count(dom_snapshot, proposed_selector)
+            py_expr = translate_locator_to_python(proposed_locator)
+            proposed_count = await self._get_locator_count(dom_snapshot, py_expr)
         except:
             pass
 
-        # 2. Try fallback selectors
-        fallback_results = []
-        for idx, fallback in enumerate(fallback_selectors):
-            print(f"[SandboxVerifier] Proposing fallback #{idx + 1}: '{fallback}'")
-            if await self.verify_selector(dom_snapshot, fallback):
-                return fallback, "verified_unique"
-            try:
-                fallback_count = await self._get_count(dom_snapshot, fallback)
-                fallback_results.append(fallback_count)
-            except:
-                fallback_results.append(0)
+        # 2. Try fallback expression
+        print(f"[SandboxVerifier] Verifying fallback expression: '{fallback_expression}'")
+        if await self.verify_locator_expression(dom_snapshot, fallback_expression):
+            return fallback_expression, "verified_unique"
+        
+        fallback_count = 0
+        try:
+            py_expr = translate_locator_to_python(fallback_expression)
+            fallback_count = await self._get_locator_count(dom_snapshot, py_expr)
+        except:
+            pass
 
-        # None matched exactly 1 element. Classify the failure.
-        if proposed_count > 1 or any(count > 1 for count in fallback_results):
-            # Recommend the first selector that was ambiguous (matched multiple)
+        # Classify the failure status
+        if proposed_count > 1 or fallback_count > 1:
             if proposed_count > 1:
-                return proposed_selector, "ambiguous_match"
-            for idx, count in enumerate(fallback_results):
-                if count > 1:
-                    return fallback_selectors[idx], "ambiguous_match"
+                return proposed_locator, "ambiguous_match"
+            return fallback_expression, "ambiguous_match"
 
-        # No match at all
-        return proposed_selector, "failed"
+        return proposed_locator, "failed"
 
-    async def _get_count(self, dom_snapshot: str, selector: str) -> int:
+    async def _get_locator_count(self, dom_snapshot: str, py_expression: str) -> int:
         await self._ensure_browser()
         context = await self._browser.new_context()
         page = await context.new_page()
         try:
             await page.set_content(dom_snapshot)
-            return await page.locator(selector).count()
+            locator = eval(py_expression, {"page": page})
+            return await locator.count()
         finally:
             await page.close()
             await context.close()

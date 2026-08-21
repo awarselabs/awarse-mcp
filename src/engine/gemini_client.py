@@ -27,7 +27,7 @@ class GeminiHealerClient:
         self,
         broken_selector: str,
         error_message: str,
-        sanitized_dom: str,
+        dom_snapshot: str,  # Ingests the ARIA snapshot or HTML DOM
         target_url: str = None
     ) -> GeminiHealResponse:
         """
@@ -35,55 +35,54 @@ class GeminiHealerClient:
         If AWARSE_MOCK_HEAL is True, returns a mock healing patch directly.
         """
         if settings.awarse_mock_heal:
-            # Simulated response for verification and testing
             print("[GeminiHealerClient] MOCK MODE ACTIVE: Returning mock healing response.")
-            # Customize mock response depending on broken selector for more robust testing
             if broken_selector == "#submit-btn":
                 return GeminiHealResponse(
-                    proposed_selector="#healed-submit-action-button",
+                    proposed_playwright_call="page.get_by_role('button', name='Submit')",
+                    selector_type="role",
                     confidence_score=1.0,
-                    rationale="Simulated healing: element selector changed from '#submit-btn' to '#healed-submit-action-button' due to DOM mutation.",
-                    fallback_selectors=["button[type='submit']", "button:has-text('Submit')"]
+                    rationale="Simulated healing: element selector changed from '#submit-btn' to a stable role locator.",
+                    fallback_expression="page.locator('#healed-submit-action-button')"
                 )
             elif broken_selector == ".broken-username":
                 return GeminiHealResponse(
-                    proposed_selector="#username",
+                    proposed_playwright_call="page.get_by_placeholder('Username')",
+                    selector_type="role",
                     confidence_score=1.0,
                     rationale="Simulated username field healing.",
-                    fallback_selectors=["input[name='username']", "input[placeholder='Username']"]
+                    fallback_expression="page.get_by_label('Username')"
                 )
             else:
                 return GeminiHealResponse(
-                    proposed_selector=broken_selector,
+                    proposed_playwright_call=f"page.locator('{broken_selector}')",
+                    selector_type="css",
                     confidence_score=0.5,
-                    rationale="Simulated fallback (no-op).",
-                    fallback_selectors=[broken_selector, broken_selector]
+                    rationale="Simulated fallback.",
+                    fallback_expression=f"page.locator('{broken_selector}')"
                 )
 
         # Build prompt
         prompt = f"""You are the self-healing engine of AWARSE (Autonomous Web-Automation Runtime Self-Healing Engine).
-An automation selector has failed at runtime. Your task is to identify the best replacement selector based on the target element's context in the sanitized DOM snapshot.
+An automation action has failed because the locator could not be resolved.
+Your task is to analyze the runtime context and the page's ARIA tree layout to identify the most resilient replacement locator.
 
 ### Context:
 - Target URL: {target_url or 'Unknown'}
-- Failed Selector: {broken_selector}
-- Error Message: {error_message}
+- Failed Selector / Expression: {broken_selector}
+- Runtime Exception Details: {error_message}
 
-### Sanitized DOM Snapshot:
-```html
-{sanitized_dom}
+### Page ARIA Snapshot (YAML / Compact Tree representation):
+```yaml
+{dom_snapshot}
 ```
 
-### Guidelines for Selector Generation:
-1. Prioritize resilient locating strategies:
-   - Use stable accessibility identifiers (e.g. Playwright 'getByRole', 'getByLabel', 'getByPlaceholder', 'getByText', or 'getByTestId').
-   - Use persistent 'data-testid' or 'data-test' attributes.
-   - Use stable text anchors and element types.
-   - Avoid brittle selectors like auto-generated Tailwind class hashes, absolute XPaths, or index-dependent paths.
-2. Ensure you propose a primary selector ('proposed_selector') and exactly two distinct 'fallback_selectors'.
-3. Provide a clear rationale describing what broke (e.g., dynamic class changes, element restructuring) and why the new selector was chosen.
+### Locator Heuristics Strategy Rules (Strict Order of Preference):
+1. **Accessibility Roles (`getByRole`)**: Use `page.getByRole(role, {{ name: '...' }})` or `page.getByRole(role, {{ description: '...' }})`. This is the most resilient strategy.
+2. **Standard Label/Placeholder/TestID Locators**: Use `page.getByTestId()`, `page.getByLabel()`, or `page.getByPlaceholder()`.
+3. **Resilient Chained Selectors**: Use `.or()` to chain fallbacks (e.g. `page.getByRole('button', {{ name: 'Submit' }}).or(page.locator('#healed-submit'))`).
+4. **Stable CSS/XPath**: Use standard locators like `page.locator('button.submit-action')` ONLY if no accessible roles or text anchors are available.
 
-Provide your response strictly conforming to the JSON schema.
+Return your response strictly adhering to the JSON schema. Use standard Python/TS Playwright expression syntax for the proposed locator.
 """
 
         # Call Gemini using official SDK
@@ -91,11 +90,9 @@ Provide your response strictly conforming to the JSON schema.
             response_mime_type="application/json",
             response_schema=GeminiHealResponse,
             temperature=0.1,
-            system_instruction="You are a senior SDET and expert web-automation engineer. You always output valid JSON adhering to the specified schema."
+            system_instruction="You are an expert SDET and systems architect specializing in Playwright automation. You output ONLY valid JSON adhering to the specified schema."
         )
 
-        # google-genai client does synchronous calls via model.generate_content.
-        # We wrap in asyncio.to_thread to prevent blocking the async event loop.
         import asyncio
         loop = asyncio.get_event_loop()
         
@@ -108,9 +105,6 @@ Provide your response strictly conforming to the JSON schema.
             )
         )
         
-        # Parse the structured response
         response_text = response.text.strip()
-        
-        # Parse text into Pydantic model
         data = json.loads(response_text)
         return GeminiHealResponse(**data)

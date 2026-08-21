@@ -2,21 +2,25 @@ from pydantic import BaseModel, Field
 from typing import List, Optional
 
 class GeminiHealResponse(BaseModel):
-    proposed_selector: str = Field(
+    proposed_playwright_call: str = Field(
         ...,
-        description="The primary healed CSS, XPath, or Playwright selector to locate the target element."
+        description="The primary Playwright locator expression (e.g. page.get_by_role('button', name='Sign In') or page.get_by_test_id('submit'))."
+    )
+    selector_type: str = Field(
+        ...,
+        description="The type of selector chosen. Must be one of: 'role', 'testid', 'chained_or', 'css'."
     )
     confidence_score: float = Field(
         ...,
-        description="Confidence score (from 0.0 to 1.0) indicating how likely this selector matches the intended element."
+        description="Confidence score (from 0.0 to 1.0) indicating how likely this locator matches the intended element."
     )
     rationale: str = Field(
         ...,
-        description="Detailed explanation of why the original selector failed and why this replacement selector is recommended."
+        description="Explanation of why the original selector failed and why this Playwright locator is recommended."
     )
-    fallback_selectors: List[str] = Field(
+    fallback_expression: str = Field(
         ...,
-        description="A list of exactly two alternative selectors (e.g. text-based, role-based, or test-id) in case the proposed one fails."
+        description="An alternative Playwright locator expression (e.g. using a different role, placeholder, text, or a chained .or() condition)."
     )
 
 class HealedSelectorResponse(GeminiHealResponse):

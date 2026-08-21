@@ -19,11 +19,10 @@ async def test_heal_selector_tool_mock_mode():
         
         # Verify the schema and values returned
         assert isinstance(response, HealedSelectorResponse)
-        assert response.proposed_selector == "#healed-submit-action-button"
+        assert response.proposed_playwright_call == "page.get_by_role('button', name='Submit')"
         assert response.confidence_score == 1.0
         assert "Simulated healing" in response.rationale
         assert response.verification_status == "verified_unique"
-        assert len(response.fallback_selectors) == 2
-        assert response.fallback_selectors[0] == "button[type='submit']"
+        assert response.fallback_expression == "page.locator('#healed-submit-action-button')"
     finally:
         settings.awarse_mock_heal = old_mock
