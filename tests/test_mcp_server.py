@@ -5,8 +5,8 @@ from src.types import settings, HealedSelectorResponse
 @pytest.mark.asyncio
 async def test_heal_selector_tool_mock_mode():
     # Ensure mock mode is active for this test
-    old_mock = settings.awarse_mock_heal
-    settings.awarse_mock_heal = True
+    old_mock = settings.healwright_mock_heal
+    settings.healwright_mock_heal = True
     
     try:
         # Invoke the FastMCP tool handler directly
@@ -25,4 +25,4 @@ async def test_heal_selector_tool_mock_mode():
         assert response.verification_status == "verified_unique"
         assert response.fallback_expression == "page.locator('#healed-submit-action-button')"
     finally:
-        settings.awarse_mock_heal = old_mock
+        settings.healwright_mock_heal = old_mock

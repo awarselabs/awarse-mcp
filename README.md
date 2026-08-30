@@ -1,6 +1,6 @@
-# AWARSE: Autonomous Playwright Self-Healing Selector Engine (MCP Server)
+# Healwright: The autonomous Playwright self-healing engine that turns red CI pipelines green in under 500ms.
 
-AWARSE is a production-grade **Autonomous Playwright Self-Healing Selector Engine** operating as a Model Context Protocol (MCP) server. It catches failing Playwright locators at runtime, analyzes token-optimized **ARIA snapshots** via Gemini 2.5 Pro / Flash, verifies healed expressions in a sandboxed headless browser, and generates AST-based source code patches to hot-fix the spec files on disk.
+Healwright is a production-grade **Autonomous Playwright Self-Healing Selector Engine** operating as a Model Context Protocol (MCP) server (registered as `healwright-mcp`). It catches failing Playwright locators at runtime, analyzes token-optimized **ARIA snapshots** via Gemini 2.5 Pro / Flash, verifies healed expressions in a sandboxed headless browser, and generates AST-based source code patches to hot-fix the spec files on disk.
 
 ---
 
@@ -10,8 +10,8 @@ AWARSE is a production-grade **Autonomous Playwright Self-Healing Selector Engin
 sequenceDiagram
     autonumber
     participant Runner as Playwright Test Runner
-    participant Fixture as smartFixture (Client Hook)
-    participant Server as AWARSE MCP Server
+    participant Fixture as @healwright/fixture (Client Hook)
+    participant Server as Healwright MCP Server
     participant Gemini as Gemini API (2.5 Pro / Flash)
     participant Sandbox as Headless Playwright Sandbox
     participant Patcher as AST / Text Patcher
@@ -60,7 +60,7 @@ sequenceDiagram
   4. Brittle CSS/XPath locators as a last resort.
 * **Sandboxed Locator Evaluator**: Automatically evaluates and executes JS/TS Playwright locator call expressions dynamically inside a headless Playwright Chromium sandbox browser to guarantee element uniqueness (`count === 1`) and visibility.
 * **AST-Based Source Code Patching**: Includes a Python AST rewriter (using `ast` modules) and JavaScript/TypeScript rewriter (using `@babel/parser` / `@babel/traverse`) that locates the exact code coordinates of the failing locator in the source file on disk and overwrites it.
-* **Smart Playwright Client Hooks**: Includes dynamic fixtures for TypeScript and Python tests that capture error line/col locations from stack traces and run self-healing.
+* **Smart Playwright Client Hooks**: Fully integrated via `@healwright/fixture` (TypeScript) and `healwright_locator` (Python pytest) to capture error line/col locations from stack traces and run self-healing.
 
 ---
 
@@ -80,9 +80,9 @@ Create a `.env` file in the root directory:
 ```env
 GEMINI_API_KEY="your-gemini-api-key"
 GEMINI_MODEL="gemini-2.5-pro"  # Defaults to gemini-2.5-pro
-AWARSE_HOST="0.0.0.0"
-AWARSE_PORT=8000
-AWARSE_MOCK_HEAL=false          # Set to true for offline testing
+HEALWRIGHT_HOST="0.0.0.0"
+HEALWRIGHT_PORT=8000
+HEALWRIGHT_MOCK_HEAL=false      # Set to true for offline testing
 ```
 
 ### 3. Install Dependencies
@@ -98,7 +98,7 @@ npm install @babel/parser @babel/traverse @babel/generator
 ```
 
 ### 4. Run the MCP Server
-AWARSE supports dual transport channels:
+Healwright supports dual transport channels:
 * **Local stdio mode (Default)**:
   ```bash
   uv run src/server/mcp_server.py
@@ -117,7 +117,7 @@ Add this block to your local `claude_desktop_config.json`:
 ```json
 {
   "mcpServers": {
-    "awarse-healer": {
+    "healwright-mcp": {
       "command": "/path/to/awarse-mcp/venv/bin/python",
       "args": [
         "/path/to/awarse-mcp/src/server/mcp_server.py"
@@ -132,7 +132,7 @@ Add this block to your local `claude_desktop_config.json`:
 
 ### Cursor Config
 Add this to your Cursor settings under **MCP** -> **Add New MCP Server**:
-* **Name**: `awarse-healer`
+* **Name**: `healwright-mcp`
 * **Type**: `stdio`
 * **Command**: `/path/to/awarse-mcp/venv/bin/python /path/to/awarse-mcp/src/server/mcp_server.py`
 
@@ -140,7 +140,7 @@ Add this to your Cursor settings under **MCP** -> **Add New MCP Server**:
 
 ## 🛠️ Exposed MCP Tool: `heal_selector`
 
-Invokes the AWARSE healing pipeline:
+Invokes the Healwright healing pipeline:
 
 ### Arguments Schema
 * `broken_selector` (string, required): The failing locator expression.
@@ -175,6 +175,6 @@ PYTHONPATH=. uv run pytest tests/
 ```
 
 ### Client Integration Templates
-Integrate AWARSE into your test runners using the templates in `examples/`:
-* **TypeScript Playwright Fixture**: See [examples/smartFixture.ts](examples/smartFixture.ts) (captures `ariaSnapshot`, parses the spec file stack trace, calls AWARSE, and patches the file).
-* **Python Playwright pytest Fixture**: See [examples/smart_locator.py](examples/smart_locator.py).
+Integrate Healwright into your test runners using the templates in `examples/` or the npm package `@healwright/fixture` / `npx healwright`:
+* **TypeScript Playwright Fixture**: See [examples/healwrightFixture.ts](examples/healwrightFixture.ts) (captures `ariaSnapshot`, parses the spec file stack trace, calls Healwright, and patches the file).
+* **Python Playwright pytest Fixture**: See [examples/healwright_locator.py](examples/healwright_locator.py).

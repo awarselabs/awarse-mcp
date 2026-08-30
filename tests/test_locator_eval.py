@@ -24,8 +24,8 @@ def test_translate_locator_to_python():
 
 @pytest.mark.asyncio
 async def test_sandbox_verifier_with_locator_expressions():
-    old_mock = settings.awarse_mock_heal
-    settings.awarse_mock_heal = False
+    old_mock = settings.healwright_mock_heal
+    settings.healwright_mock_heal = False
 
     verifier = SandboxVerifier()
     dom_snapshot = "<html><body><button id='healed-submit-btn' name='submit-action'>Submit Form</button></body></html>"
@@ -39,4 +39,4 @@ async def test_sandbox_verifier_with_locator_expressions():
         assert res_fake is False
     finally:
         await verifier.close()
-        settings.awarse_mock_heal = old_mock
+        settings.healwright_mock_heal = old_mock

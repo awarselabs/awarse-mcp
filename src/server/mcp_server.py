@@ -8,7 +8,7 @@ from src.sandbox import SandboxVerifier
 from src.ast import patch_source_file
 
 # Initialize FastMCP Server
-mcp = FastMCP("awarse-healer")
+mcp = FastMCP("healwright-mcp")
 
 # Initialize Healer Client and Sandbox Verifier
 healer_client = GeminiHealerClient()
@@ -63,7 +63,7 @@ async def heal_selector(
 
 def shutdown_server():
     """Cleanup hook to gracefully shut down the sandbox verifier browser."""
-    print("[MCP Server] Shutting down AWARSE Healer Server...")
+    print("[MCP Server] Shutting down Healwright Server...")
     try:
         loop = asyncio.get_event_loop()
         if loop.is_running():
@@ -80,12 +80,12 @@ atexit.register(shutdown_server)
 
 if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1].lower() == "sse":
-        print(f"[*] Starting AWARSE Healer Server in SSE Mode on http://{settings.awarse_host}:{settings.awarse_port}")
+        print(f"[*] Starting Healwright Server in SSE Mode on http://{settings.healwright_host}:{settings.healwright_port}")
         mcp.run(
             transport="sse",
-            host=settings.awarse_host,
-            port=settings.awarse_port
+            host=settings.healwright_host,
+            port=settings.healwright_port
         )
     else:
-        print("[*] Starting AWARSE Healer Server in Stdio Mode...")
+        print("[*] Starting Healwright Server in Stdio Mode...")
         mcp.run(transport="stdio")

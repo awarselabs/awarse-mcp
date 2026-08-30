@@ -5,14 +5,14 @@ import { SseClientTransport } from '@modelcontextprotocol/sdk/client/sse.js';
 /**
  * Custom Playwright test fixture.
  * Intercepts action failures, parses the stack trace to find the failing code coordinates,
- * captures an ARIA snapshot, calls the AWARSE MCP server over SSE to self-heal and
+ * captures an ARIA snapshot, calls the Healwright MCP server over SSE to self-heal and
  * patch the source spec file via AST, and executes the patched action at runtime.
  */
 export const test = base.extend<{
   smartPage: any;
 }>({
   smartPage: async ({ page }, use) => {
-    // Connect to AWARSE MCP Server via SSE
+    // Connect to Healwright MCP Server via SSE
     const transport = new SseClientTransport(new URL("http://localhost:8000/sse"));
     const mcpClient = new Client(
       { name: "playwright-aria-runner", version: "2.0.0" },
@@ -21,7 +21,7 @@ export const test = base.extend<{
 
     try {
       await mcpClient.connect(transport);
-      console.log("[SmartPage] Connected to AWARSE Self-Healing MCP Server.");
+      console.log("[SmartPage] Connected to Healwright Self-Healing MCP Server.");
     } catch (err) {
       console.error("[SmartPage] Failed to connect to MCP server. Running without healing.", err);
     }
@@ -46,7 +46,7 @@ export const test = base.extend<{
               const coordinates = parseErrorCoordinates(err);
               console.log(`[SmartPage] Failed location coordinates:`, coordinates);
 
-              // 3. Invoke AWARSE selector healing tool
+              // 3. Invoke Healwright selector healing tool
               const result = await mcpClient.callTool({
                 name: "heal_selector",
                 arguments: {

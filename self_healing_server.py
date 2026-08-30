@@ -297,7 +297,10 @@ class PlaywrightDriver(BaseDriver):
         if self.page is None:
             print("[AWARSE] Launching Playwright headless browser...")
             self.playwright = await async_playwright().start()
-            self.browser = await self.playwright.chromium.launch(headless=True)
+            self.browser = await self.playwright.chromium.launch(
+                headless=True,
+                args=["--no-sandbox", "--disable-setuid-sandbox"]
+            )
             self.context = await self.browser.new_context()
             self.page = await self.context.new_page()
         return self.page

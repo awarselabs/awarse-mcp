@@ -80,7 +80,7 @@ class SandboxVerifier:
         Loads the DOM snapshot or ARIA snapshot into a sandboxed page and checks if the locator
         expression is unique (count == 1) and visible.
         """
-        if settings.awarse_mock_heal:
+        if settings.healwright_mock_heal:
             # Under mock heal mode, simulate uniqueness check for verification target
             return "Submit" in expression or "Username" in expression or "healed" in expression
 
@@ -116,7 +116,7 @@ class SandboxVerifier:
         Evaluates the proposed Playwright locator and the fallback expression.
         Returns a tuple of (resolved_locator, status).
         """
-        if settings.awarse_mock_heal:
+        if settings.healwright_mock_heal:
             print("[SandboxVerifier] MOCK MODE ACTIVE: Bypassing browser verification, assuming verified_unique.")
             return proposed_locator, "verified_unique"
 

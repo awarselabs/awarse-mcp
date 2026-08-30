@@ -1,12 +1,12 @@
-# AWARSE User & Configuration Guidelines
+# Healwright User & Configuration Guidelines
 
-This document provides detailed guidelines on configuring the **Autonomous Web-Automation Runtime Self-Healing Engine (AWARSE)** for different Large Language Model (LLM) providers and web/mobile automation frameworks.
+This document provides detailed guidelines on configuring the **Autonomous Playwright Self-Healing Selector Engine (Healwright)** for different Large Language Model (LLM) providers and web/mobile automation frameworks.
 
 ---
 
 ## 📋 Compatibility Matrix
 
-AWARSE is built on a modular driver architecture and LLM routing layer. The table below shows the support matrix:
+Healwright is built on a modular driver architecture and LLM routing layer. The table below shows the support matrix:
 
 | Framework | Gemini (Default) | Claude (Anthropic) | OpenAI / Copilot | Local LLMs (Ollama/vLLM) |
 | :--- | :---: | :---: | :---: | :---: |
@@ -18,7 +18,7 @@ AWARSE is built on a modular driver architecture and LLM routing layer. The tabl
 
 ## 🤖 Configuring LLM Providers
 
-AWARSE uses the `LLM_PROVIDER` environment variable to determine which client libraries and API endpoints to call when self-healing. Add these configurations to your `.env` file or export them in your terminal.
+Healwright uses the `LLM_PROVIDER` environment variable to determine which client libraries and API endpoints to call when self-healing. Add these configurations to your `.env` file or export them in your terminal.
 
 ### 1. Google Gemini (Default)
 Recommended model: `gemini-2.5-flash` (fast, highly accurate at locating visual structure, very cost-effective).
@@ -65,7 +65,7 @@ OPENAI_MODEL="llama3"  # Replace with your loaded Ollama model
 
 ## ⚙️ Configuring Automation Frameworks
 
-AWARSE abstracts the browser or device operations behind a driver class. Swap the driver using the `AUTOMATION_FRAMEWORK` variable.
+Healwright abstracts the browser or device operations behind a driver class. Swap the driver using the `AUTOMATION_FRAMEWORK` variable.
 
 ### 1. Playwright (Web - Asynchronous)
 The default and recommended web automation framework. Fast, headless by default, and supports modern web APIs.
@@ -91,10 +91,10 @@ Ideal for integrating with legacy test suites or corporate Selenium grids.
   ```env
   AUTOMATION_FRAMEWORK="selenium"
   ```
-* **Driver Lifecycle:** AWARSE launches a headless Chrome instance automatically using WebDriver manager defaults. Ensure Google Chrome is installed on the host machine.
+* **Driver Lifecycle:** Healwright launches a headless Chrome instance automatically using WebDriver manager defaults. Ensure Google Chrome is installed on the host machine.
 
 ### 3. Appium (Mobile Native / Hybrid)
-Used for Android or iOS app self-healing. AWARSE extracts the XML source layout structure instead of HTML DOM maps to heal selectors.
+Used for Android or iOS app self-healing. Healwright extracts the XML source layout structure instead of HTML DOM maps to heal selectors.
 
 * **Dependencies:**
   ```bash
@@ -169,7 +169,7 @@ OPENAI_MODEL="gpt-4o-mini"
 
 ## 🔍 Fine-Tuning Snapshot Performance
 
-AWARSE supports two layout representation modes for web drivers:
+Healwright supports two layout representation modes for web drivers:
 
 1. **Token-Efficient Mode (`TOKEN_EFFICIENT_MODE="true"`) [Default]:**
    - Automatically executes a Javascript query inside the browser viewport.
@@ -189,7 +189,7 @@ AWARSE supports two layout representation modes for web drivers:
 * **Appium Session Creation Failures:**
   Ensure the Appium server is running (`appium` in terminal) and that the emulator/device is connected (`adb devices` matches the device capability).
 * **Missing API Key Errors:**
-  If AWARSE complains about missing credentials, verify that the `.env` file is in the root directory from which the MCP server is launched. When running inside visual editors (like Cursor or Claude Desktop), configure the environment variables directly inside the editor's `mcp_config.json` block:
+  If Healwright complains about missing credentials, verify that the `.env` file is in the root directory from which the MCP server is launched. When running inside visual editors (like Cursor or Claude Desktop), configure the environment variables directly inside the editor's `mcp_config.json` block:
   ```json
   "env": {
     "LLM_PROVIDER": "gemini",

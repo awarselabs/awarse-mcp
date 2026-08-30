@@ -4,8 +4,8 @@ from src.types import settings
 
 @pytest.mark.asyncio
 async def test_sandbox_verifier_unique_element():
-    old_mock = settings.awarse_mock_heal
-    settings.awarse_mock_heal = False
+    old_mock = settings.healwright_mock_heal
+    settings.healwright_mock_heal = False
     
     verifier = SandboxVerifier()
     dom_snapshot = "<html><body><button id='unique-btn'>Click me</button></body></html>"
@@ -19,12 +19,12 @@ async def test_sandbox_verifier_unique_element():
         assert is_unique_fake is False
     finally:
         await verifier.close()
-        settings.awarse_mock_heal = old_mock
+        settings.healwright_mock_heal = old_mock
 
 @pytest.mark.asyncio
 async def test_sandbox_verifier_duplicate_elements():
-    old_mock = settings.awarse_mock_heal
-    settings.awarse_mock_heal = False
+    old_mock = settings.healwright_mock_heal
+    settings.healwright_mock_heal = False
     
     verifier = SandboxVerifier()
     dom_snapshot = "<html><body><button class='btn'>Btn 1</button><button class='btn'>Btn 2</button></body></html>"
@@ -34,12 +34,12 @@ async def test_sandbox_verifier_duplicate_elements():
         assert is_unique is False
     finally:
         await verifier.close()
-        settings.awarse_mock_heal = old_mock
+        settings.healwright_mock_heal = old_mock
 
 @pytest.mark.asyncio
 async def test_sandbox_verifier_resolve_fallbacks():
-    old_mock = settings.awarse_mock_heal
-    settings.awarse_mock_heal = False
+    old_mock = settings.healwright_mock_heal
+    settings.healwright_mock_heal = False
     
     verifier = SandboxVerifier()
     dom_snapshot = """
@@ -64,4 +64,4 @@ async def test_sandbox_verifier_resolve_fallbacks():
         assert status == "verified_unique"
     finally:
         await verifier.close()
-        settings.awarse_mock_heal = old_mock
+        settings.healwright_mock_heal = old_mock

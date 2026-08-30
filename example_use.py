@@ -7,15 +7,15 @@ from google.antigravity import Agent, LocalAgentConfig, types
 dotenv.load_dotenv()
 
 async def run_self_healing_automation():
-    print("[INFO] Starting AWARSE Self-Healing Web Automation Example...")
+    print("[INFO] Starting Healwright Self-Healing Web Automation Example...")
     
-    # 1. Define the AWARSE MCP Server configuration
+    # 1. Define the Healwright MCP Server configuration
     # The agent will launch and manage this server during the session lifecycle
     mcp_servers = [
         types.McpStdioServer(
-            name="awarse",
+            name="healwright-mcp",
             command="venv/bin/python",
-            args=["self_healing_server.py"],
+            args=["src/server/mcp_server.py"],
             env={
                 "GEMINI_API_KEY": os.environ.get("GEMINI_API_KEY")
             }
@@ -23,7 +23,7 @@ async def run_self_healing_automation():
     ]
     
     # 2. Configure the Antigravity Agent
-    # We equip the agent with the AWARSE server so it has self-healing tools
+    # We equip the agent with the Healwright server so it has self-healing tools
     config = LocalAgentConfig(
         model_name="gemini-1.5-flash",
         mcp_servers=mcp_servers
@@ -34,7 +34,7 @@ async def run_self_healing_automation():
     test_page_url = f"file://{test_page_path}"
     
     async with Agent(config) as agent:
-        print("[AGENT] Initialized and connected to AWARSE MCP server.")
+        print("[AGENT] Initialized and connected to Healwright MCP server.")
         
         # Action 1: Navigate to the login/submission page
         print(f"[AGENT] Directing agent to navigate to: {test_page_url}")
@@ -53,7 +53,7 @@ async def run_self_healing_automation():
         print(f"[AGENT RESPONSE]:\n{await res.text()}\n")
         
         # Action 4: Instruct the agent to click the original, now-broken button selector
-        # AWARSE will intercept the failure, invoke Gemini, find the new button, and click it successfully
+        # Healwright will intercept the failure, invoke Gemini, find the new button, and click it successfully
         print("[AGENT] Directing agent to submit the form using the old selector '#submit-btn'...")
         res = await agent.chat("Click the element with selector '#submit-btn'")
         print(f"[AGENT RESPONSE]:\n{await res.text()}\n")

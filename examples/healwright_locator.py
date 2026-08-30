@@ -4,7 +4,7 @@ import pytest
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 
-# Launch parameters for local AWARSE MCP server
+# Launch parameters for local Healwright MCP server
 server_parameters = StdioServerParameters(
     command="venv/bin/python",
     args=["src/server/mcp_server.py"]
@@ -15,13 +15,13 @@ async def smart_page(page):
     """
     pytest fixture wrapping Playwright page.
     Captures ARIA accessibility snapshots, extracts traceback call coordinates,
-    invokes AWARSE MCP over stdio to heal selector and patch spec file via AST,
+    invokes Healwright MCP over stdio to heal selector and patch spec file via AST,
     and dynamically evaluates the new locator call at runtime.
     """
     async with stdio_client(server_parameters) as (read, write):
         async with ClientSession(read, write) as session:
             await session.initialize()
-            print("[smart_page] Connected to local AWARSE MCP server.")
+            print("[smart_page] Connected to local Healwright MCP server.")
 
             class SmartPageWrapper:
                 def __init__(self, page_instance):

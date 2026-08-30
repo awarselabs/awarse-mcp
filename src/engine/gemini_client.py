@@ -15,14 +15,14 @@ class GeminiHealerClient:
             api_key = settings.gemini_api_key
             if not api_key:
                 # If mock mode is not active, raise an error
-                if not settings.awarse_mock_heal:
+                if not settings.healwright_mock_heal:
                     raise ValueError(
                         "GEMINI_API_KEY is not configured in settings. "
                         "Please set the GEMINI_API_KEY environment variable or configured in .env."
                     )
             self._client = genai.Client(api_key=api_key)
         return self._client
-
+ 
     async def get_healed_selector(
         self,
         broken_selector: str,
@@ -32,9 +32,9 @@ class GeminiHealerClient:
     ) -> GeminiHealResponse:
         """
         Sends the healing request to Gemini using Structured Outputs and low temperature.
-        If AWARSE_MOCK_HEAL is True, returns a mock healing patch directly.
+        If HEALWRIGHT_MOCK_HEAL is True, returns a mock healing patch directly.
         """
-        if settings.awarse_mock_heal:
+        if settings.healwright_mock_heal:
             print("[GeminiHealerClient] MOCK MODE ACTIVE: Returning mock healing response.")
             if broken_selector == "#submit-btn":
                 return GeminiHealResponse(
@@ -60,9 +60,9 @@ class GeminiHealerClient:
                     rationale="Simulated fallback.",
                     fallback_expression=f"page.locator('{broken_selector}')"
                 )
-
+ 
         # Build prompt
-        prompt = f"""You are the self-healing engine of AWARSE (Autonomous Web-Automation Runtime Self-Healing Engine).
+        prompt = f"""You are the self-healing engine of Healwright (Autonomous Playwright Self-Healing Selector Engine).
 An automation action has failed because the locator could not be resolved.
 Your task is to analyze the runtime context and the page's ARIA tree layout to identify the most resilient replacement locator.
 
