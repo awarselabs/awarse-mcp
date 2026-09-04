@@ -1,0 +1,99 @@
+{
+  "$schema": "https://smithery.ai/schemas/server-card.json",
+  "serverInfo": {
+    "name": "seatprune",
+    "version": "0.1.0",
+    "description": "FinOps agentic seat governance & license reclamation MCP server"
+  },
+  "authentication": {
+    "required": true,
+    "schemes": [
+      {
+        "type": "pat",
+        "name": "GITHUB_TOKEN",
+        "description": "GitHub Personal Access Token with admin:org scope to scan organization seat usage."
+      }
+    ]
+  },
+  "tools": [
+    {
+      "name": "audit_organization_seats",
+      "description": "Perform a FinOps audit on organization SaaS seats and compute spend leakage.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "org_name": {
+            "type": "string",
+            "description": "Target GitHub organization name"
+          },
+          "threshold_days": {
+            "type": "integer",
+            "description": "Inactivity threshold in days (default: 30)"
+          }
+        }
+      }
+    },
+    {
+      "name": "generate_reclamation_plan",
+      "description": "Generate an actionable license reclamation plan detailing zombie seats and savings.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "org_name": {
+            "type": "string",
+            "description": "Target GitHub organization name"
+          },
+          "threshold_days": {
+            "type": "integer",
+            "description": "Inactivity threshold in days (default: 30)"
+          },
+          "dry_run": {
+            "type": "boolean",
+            "description": "Simulate plan without modifying seats (default: true)"
+          }
+        }
+      }
+    },
+    {
+      "name": "execute_reclamation",
+      "description": "Execute seat removal or downgrade actions with strict dry-run safety locks.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "org_name": {
+            "type": "string",
+            "description": "Target GitHub organization name"
+          },
+          "dry_run": {
+            "type": "boolean",
+            "description": "Safety lock preventing actual modification if true (default: true)"
+          }
+        }
+      }
+    },
+    {
+      "name": "send_slack_alert",
+      "description": "Dispatch Slack Block Kit check-in alert for pending license reclamation plan.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "org_name": {
+            "type": "string",
+            "description": "Target GitHub organization name"
+          },
+          "webhook_url": {
+            "type": "string",
+            "description": "Optional Slack Incoming Webhook URL"
+          }
+        }
+      }
+    }
+  ],
+  "resources": [
+    {
+      "uri": "seatprune://audit/latest",
+      "name": "Latest Audit Report",
+      "description": "JSON object of the most recently executed organization seat audit."
+    }
+  ]
+}
