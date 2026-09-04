@@ -1,4 +1,4 @@
-# SeatPrune: Zero-Config License Reclamation (Worker & MCP Server)
+# SeatPrune: GitHub FinOps & License Reclamation MCP Server
 
 [![Smithery Badge](https://smithery.ai/badge/@skildunne/seatprune)](https://smithery.ai/servers/skildunne/seatprune)
 

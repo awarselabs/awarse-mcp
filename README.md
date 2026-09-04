@@ -1,10 +1,12 @@
-# Healwright & SeatPrune
+# Healwright & SeatPrune MCP Servers
 
 [![Smithery Badge](https://smithery.ai/badge/@skildunne/seatprune)](https://smithery.ai/servers/skildunne/seatprune)
 
-**Healwright** is an autonomous Playwright self-healing selector engine that turns red CI pipelines green in under 500ms. It catches failing Playwright locators at runtime, analyzes token-optimized **ARIA snapshots** via Gemini 2.5 Pro / Flash, verifies healed expressions in a sandboxed headless browser, and generates AST-based source code patches to hot-fix spec files on disk.
+## 🌿 SeatPrune: GitHub FinOps & License Reclamation MCP Server
+**SeatPrune** (`skildunne/seatprune`) is an autonomous SaaS seat governance and license reclamation MCP server that audits GitHub, Copilot, and Slack utilization to detect zombie seats, enforce dry-run safety locks, and reclaim spend leakage.
 
-**SeatPrune** (`skildunne/seatprune`) is a zero-config SaaS seat governance and license reclamation engine that audits GitHub, Copilot, and Slack utilization to recover dormant developer seats and spend leakage.
+## 🛠️ Healwright: Playwright Self-Healing Selector Engine
+**Healwright** (`healwright-mcp`) is an autonomous Playwright self-healing selector engine that turns red CI pipelines green in under 500ms by analyzing compact **ARIA snapshots** via Gemini 2.5 and hot-fixing spec files on disk.
 
 ---
 
