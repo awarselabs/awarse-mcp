@@ -1,0 +1,22 @@
+startCommand:
+  type: stdio
+  configSchema:
+    type: object
+    required:
+      - githubToken
+    properties:
+      githubToken:
+        type: string
+        description: "GitHub Personal Access Token with admin:org permissions to scan organization seat usage."
+      slackWebhookUrl:
+        type: string
+        description: "Optional Slack Incoming Webhook URL to dispatch reclamation alerts."
+  commandLine:
+    command: "uvx"
+    args:
+      - "--from"
+      - "seatprune"
+      - "seatprune-mcp"
+    env:
+      GITHUB_TOKEN: "{{config.githubToken}}"
+      SLACK_WEBHOOK_URL: "{{config.slackWebhookUrl}}"
