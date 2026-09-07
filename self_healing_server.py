@@ -20,7 +20,7 @@ mcp = FastMCP("awarse")
 # In-memory log of healed selectors for the session
 healed_logs = []
 
-def start_dashboard(port=8080):
+def start_dashboard(port=int(os.environ.get("AWARSE_DASHBOARD_PORT", 8088))):
     class QuietHandler(SimpleHTTPRequestHandler):
         # Quiet console spam during stdio transport sessions
         def log_message(self, format, *args):
