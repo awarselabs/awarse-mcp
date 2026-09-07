@@ -1,0 +1,24 @@
+name: Daily Traffic Digest
+
+on:
+  schedule:
+    # Runs at 08:00 UTC every morning
+    - cron: '0 8 * * *'
+  workflow_dispatch:
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Execute Monitor
+        env:
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CF_ZONE_ID: ${{ secrets.CF_ZONE_ID }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          REPORT_RECIPIENT: ${{ secrets.REPORT_RECIPIENT }}
+        run: python traffic_agent.py
