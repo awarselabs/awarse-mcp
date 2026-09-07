@@ -1,68 +1,42 @@
 Output demo.gif
-Set FontSize 15
-Set Width 920
-Set Height 540
+Set FontSize 14
+Set Width 860
+Set Height 420
 Set Theme "tokyonight"
 Set Padding 20
 
-Type "pytest tests/test_checkout.py"
-Enter
-Sleep 1s
-
-Type "============================= test session starts ============================="
-Enter
-Type "platform linux -- Python 3.11.9, pytest-8.1.1, pluggy-1.4.0"
-Enter
-Type "rootdir: /app"
-Enter
-Type "plugins: healwright-0.1.0"
-Enter
-Type "collected 1 item"
+Type "python -m pytest test_checkout.py"
 Enter
 Sleep 1.5s
 
-Type "tests/test_checkout.py F"
+# Simulate the initial test failure
+Type "echo -e '\033[1;31mFAILED\033[0m test_checkout.py::test_login - \033[0;33mLocator not found: button#submit-btn-v1\033[0m'"
 Enter
 Sleep 1s
 
-Type "___________________________________ test_checkout ___________________________________"
-Enter
-Type "    async def test_checkout(page):"
-Enter
-Type ">       await page.click('button#submit-btn-v1')"
-Enter
-Type "E       playwright._impl._api_types.TimeoutError: Timeout 3000ms exceeded."
-Enter
-Type "E       Call log: waiting for locator('button#submit-btn-v1')"
-Enter
-Sleep 2s
-
-Type "pytest --healwright tests/test_checkout.py"
-Enter
-Sleep 1.5s
-
-Type "[Healwright] 🧬 Self-Healing Interceptor activated..."
-Enter
-Sleep 1.2s
-Type "[Healwright] 📸 Capturing ARIA snapshot layout tree..."
-Enter
-Sleep 1.2s
-Type "[Healwright] 🤖 Querying Gemini 2.5 Pro for resilient locator..."
-Enter
-Sleep 1.5s
-Type "[Healwright] ✅ Verified locator: page.getByRole('button', { name: 'Complete Checkout' })"
-Enter
-Sleep 1.2s
-Type "[Healwright] 📝 Hot-patching AST source: tests/test_checkout.py (Line 24)"
-Enter
-Sleep 2s
-
-Type "pytest tests/test_checkout.py"
-Enter
-Sleep 1.2s
-Type "tests/test_checkout.py .                                           [100%]"
+# Trigger the healing action
+Type "python -m awarse heal --last-failed"
 Enter
 Sleep 1s
-Type "============================== 1 passed in 0.42s =============================="
+
+# Simulated successful output stream
+Type "echo -e '\033[1;36m[AWARSE]\033[0m Inspecting current DOM structure...'"
 Enter
-Sleep 3.5s
+Sleep 800ms
+
+Type "echo -e '\033[1;36m[AWARSE]\033[0m Detected shift: \033[0;31mbutton#submit-btn-v1\033[0m -> \033[0;32mbutton.checkout-primary-cta\033[0m'"
+Enter
+Sleep 800ms
+
+Type "echo -e '\033[1;32m[*]\033[0m Patch applied: test_checkout.py (line 24 healed)'"
+Enter
+Sleep 1.5s
+
+# Re-run and show green
+Type "python -m pytest test_checkout.py"
+Enter
+Sleep 1.2s
+
+Type "echo -e '\033[1;32mPASSED\033[0m test_checkout.py::test_login [100%] \033[1;32m(1 passed in 0.42s)\033[0m'"
+Enter
+Sleep 3s
