@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Awarse Labs | Local-First AI DevTools & FinOps Automation</title>
+  <meta name="description" content="Local-first Model Context Protocol (MCP) agents for enterprise engineering teams. Reclaim orphaned GitHub licenses with SeatPrune and heal Playwright tests with Healwright." />
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            brand: {
+              emerald: '#10b981',
+              dark: '#090d16',
+              card: 'rgba(17, 24, 39, 0.75)',
+              border: 'rgba(255, 255, 255, 0.08)',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #060911;
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.08) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(59, 130, 246, 0.05) 0px, transparent 50%);
+      background-attachment: fixed;
+    }
+    .glass-card {
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .glass-card:hover {
+      border-color: rgba(16, 185, 129, 0.35);
+    }
+  </style>
+</head>
+<body class="text-slate-200 font-sans antialiased selection:bg-emerald-500/30 selection:text-emerald-200">
+
+  <!-- Navigation -->
+  <header class="sticky top-0 z-50 backdrop-blur-md bg-slate-950/70 border-b border-white/5">
+    <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <span class="h-3 w-3 rounded-full bg-emerald-500 shadow-[0_0_12px_#10b981]"></span>
+        <span class="font-bold text-lg tracking-tight text-white font-mono">AWARSE LABS</span>
+      </div>
+      <nav class="hidden md:flex items-center space-x-8 text-sm font-medium text-slate-400">
+        <a href="#seatprune" class="hover:text-emerald-400 transition-colors">SeatPrune</a>
+        <a href="#healwright" class="hover:text-emerald-400 transition-colors">Healwright</a>
+        <a href="#pricing" class="hover:text-emerald-400 transition-colors">Pricing</a>
+        <a href="/security" class="hover:text-emerald-400 transition-colors">Enterprise Security</a>
+        <a href="mailto:skildunne@awarselabs.com" class="text-white hover:text-emerald-400 transition-colors">Contact</a>
+      </nav>
+      <div class="flex items-center space-x-3">
+        <a href="/security" class="text-xs font-mono uppercase tracking-wider px-3.5 py-1.5 rounded-full border border-emerald-500/30 text-emerald-400 bg-emerald-500/5 hover:bg-emerald-500/10 transition-colors">
+          Security Whitepaper
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <main class="max-w-6xl mx-auto px-6 pt-20 pb-28">
+    <div class="text-center max-w-3xl mx-auto">
+      <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-mono mb-6">
+        <span>⚡ Zero-Trust MCP Tooling for Engineering Teams</span>
+      </div>
+      <h1 class="text-4xl sm:text-6xl font-bold tracking-tight text-white leading-tight mb-6">
+        Local-first AI agents for <span class="text-emerald-400">FinOps</span> & <span class="text-emerald-400">QA Automation</span>
+      </h1>
+      <p class="text-lg text-slate-400 mb-10 leading-relaxed">
+        Ephemeral, high-precision developer tools built on FastMCP. Eliminate wasted SaaS spend and flaky end-to-end tests without sending your source code or credentials off-premise.
+      </p>
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+        <a href="#seatprune" class="w-full sm:w-auto px-6 py-3 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold text-sm transition-all shadow-[0_0_20px_rgba(16,185,129,0.3)]">
+          Audit GitHub Seats
+        </a>
+        <a href="#healwright" class="w-full sm:w-auto px-6 py-3 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 border border-white/10 font-semibold text-sm transition-all">
+          Explore Healwright
+        </a>
+      </div>
+    </div>
+
+    <!-- Dual-Product Showcase -->
+    <section class="products-section" style="padding: 60px 20px; max-width: 1200px; margin: auto;">
+      <div style="text-align: center; margin-bottom: 50px;">
+        <h2 style="font-size: 2.2rem; font-weight: 700;" class="text-white">Intelligent Automation for Engineering & IT</h2>
+        <p style="color: #64748b; font-size: 1.1rem;">Two specialized tools built to eliminate manual engineering toil and wasted software spend.</p>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 40px;">
+        
+        <!-- Product 1: AWARSE -->
+        <div style="background: #0f172a; border-radius: 12px; padding: 24px; border: 1px solid #1e293b; color: #fff;">
+          <span style="background: #2563eb; color: #fff; font-size: 0.75rem; padding: 4px 10px; border-radius: 9999px; font-weight: 600; text-transform: uppercase;">Test Automation</span>
+          <h3 style="font-size: 1.5rem; margin: 16px 0 8px;">AWARSE MCP</h3>
+          <p style="color: #94a3b8; line-height: 1.5; min-height: 48px;">Autonomous self-healing Playwright locators. Connects directly to Cursor and Claude via Model Context Protocol to repair broken tests during DOM mutations.</p>
+          
+          <div style="margin: 20px 0; border-radius: 8px; overflow: hidden; border: 1px solid #334155;">
+            <img src="assets/demo.gif" alt="AWARSE Demo" style="width: 100%; display: block;" />
+          </div>
+
+          <ul style="color: #cbd5e1; font-size: 0.9rem; padding-left: 20px; margin-bottom: 24px; line-height: 1.8;">
+            <li>In-memory semantic DOM tree diffing</li>
+            <li>Zero flaky build interruptions</li>
+            <li>MCP proxy bridge compatible with standard IDEs</li>
+          </ul>
+
+          <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+            <a href="https://glama.ai/mcp/servers/awarselabs/awarse-mcp" style="background: #2563eb; color: #fff; padding: 10px 18px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 0.9rem;">View on Glama</a>
+            <a href="https://github.com/awarselabs/awarse-mcp" style="background: #1e293b; color: #fff; padding: 10px 18px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 0.9rem;">GitHub Docs</a>
+          </div>
+        </div>
+
+        <!-- Product 2: SeatPrune -->
+        <div style="background: #0f172a; border-radius: 12px; padding: 24px; border: 1px solid #1e293b; color: #fff;">
+          <span style="background: #059669; color: #fff; font-size: 0.75rem; padding: 4px 10px; border-radius: 9999px; font-weight: 600; text-transform: uppercase;">Cloud FinOps</span>
+          <h3 style="font-size: 1.5rem; margin: 16px 0 8px;">SeatPrune</h3>
+          <p style="color: #94a3b8; line-height: 1.5; min-height: 48px;">Automated Microsoft 365 SaaS license audit engine. Scans tenant graph APIs to detect orphaned accounts, unassigned Copilot licenses, and ghost seats.</p>
+          
+          <div style="margin: 20px 0; border-radius: 8px; overflow: hidden; border: 1px solid #334155;">
+            <img src="assets/seatprune_demo.gif" alt="SeatPrune Demo" style="width: 100%; display: block;" />
+          </div>
+
+          <ul style="color: #cbd5e1; font-size: 0.9rem; padding-left: 20px; margin-bottom: 24px; line-height: 1.8;">
+            <li>Detects >90-day inactive M365 E3/E5 seats</li>
+            <li>Generates executive-ready PDF audit trails</li>
+            <li>Recovers an average of $4,000–$8,000/mo in enterprise waste</li>
+          </ul>
+
+          <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+            <a href="mailto:skildunne@awarselabs.com?subject=Tenant Audit Request" style="background: #059669; color: #fff; padding: 10px 18px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 0.9rem;">Request Tenant Audit</a>
+            <a href="/security" style="background: #1e293b; color: #fff; padding: 10px 18px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 0.9rem;">Security Model</a>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Product 1: SeatPrune -->
+    <section id="seatprune" class="mt-32 pt-10">
+      <div class="glass-card rounded-2xl p-8 sm:p-12">
+        <div class="flex flex-col lg:flex-row gap-10 items-start justify-between">
+          <div class="max-w-xl">
+            <div class="flex items-center justify-between mb-2">
+              <div class="text-xs font-mono uppercase tracking-widest text-emerald-400">FinOps Governance Agent</div>
+              <div class="text-emerald-400 font-mono font-bold text-lg">€19<span class="text-xs text-slate-400">/mo</span></div>
+            </div>
+            <h2 class="text-2xl sm:text-3xl font-bold text-white mb-4">SeatPrune Pro</h2>
+            <p class="text-slate-400 text-sm leading-relaxed mb-6">
+              Identify and reclaim orphaned seats across GitHub Enterprise and GitHub Copilot in seconds. Automated safety locks, dry-run simulations, and protected account governance prevent accidental de-provisioning.
+            </p>
+            <ul class="space-y-2 text-sm text-slate-300 font-mono mb-8">
+              <li class="flex items-center space-x-2">
+                <span class="text-emerald-400">✓</span>
+                <span>Default <code class="text-emerald-300">--dry-run</code> protection</span>
+              </li>
+              <li class="flex items-center space-x-2">
+                <span class="text-emerald-400">✓</span>
+                <span>Protected service accounts via <code class="text-emerald-300">SEATPRUNE_ALLOWLIST</code></span>
+              </li>
+              <li class="flex items-center space-x-2">
+                <span class="text-emerald-400">✓</span>
+                <span>Zero source code inspection | Strict read-only tokens</span>
+              </li>
+            </ul>
+            <div class="flex flex-wrap items-center gap-4">
+              <a href="https://buy.stripe.com/5kQbJ2a5h7nJ0UF8qk5sA00" 
+                 target="_blank" 
+                 rel="noopener noreferrer"
+                 class="px-5 py-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold text-xs font-mono tracking-wide transition-all shadow-[0_0_15px_rgba(16,185,129,0.3)]">
+                Audit GitHub Seats
+              </a>
+              <a href="/security" class="text-xs font-semibold text-emerald-400 hover:text-emerald-300 flex items-center space-x-1">
+                <span>View Security Spec & PDF</span>
+                <span>→</span>
+              </a>
+            </div>
+          </div>
+          <div class="w-full lg:max-w-md bg-slate-950 rounded-xl p-5 border border-white/10 font-mono text-xs text-slate-300 shadow-2xl">
+            <div class="flex items-center space-x-2 mb-4 text-slate-600 border-b border-white/5 pb-3">
+              <span class="h-2.5 w-2.5 rounded-full bg-red-500/80"></span>
+              <span class="h-2.5 w-2.5 rounded-full bg-yellow-500/80"></span>
+              <span class="h-2.5 w-2.5 rounded-full bg-emerald-500/80"></span>
+              <span class="ml-2 text-slate-500">seatprune-audit.sh</span>
+            </div>
+            <p class="text-slate-500 mb-2"># Run instant ephemeral dry-run audit</p>
+            <p class="text-emerald-400 mb-4">$ uvx --from seatprune seatprune-mcp</p>
+            <p class="text-slate-400">Scanning org: <span class="text-white">acme-corp</span></p>
+            <p class="text-slate-400">Total Seats: <span class="text-white">182</span></p>
+            <p class="text-yellow-400">Inactive (>60d): 24 seats identified</p>
+            <p class="text-emerald-400 font-semibold mt-2">Potential Annual Savings: $5,040 / year</p>
+            <p class="text-slate-500 mt-2">[DRY-RUN] No changes committed.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Product 2: Healwright -->
+    <section id="healwright" class="mt-20 pt-10">
+      <div class="glass-card rounded-2xl p-8 sm:p-12">
+        <div class="flex flex-col lg:flex-row gap-10 items-start justify-between">
+          <div class="max-w-xl">
+            <div class="flex items-center justify-between mb-2">
+              <div class="text-xs font-mono uppercase tracking-widest text-emerald-400">Autonomous Test Resilience</div>
+              <div class="text-emerald-400 font-mono font-bold text-lg">€29<span class="text-xs text-slate-400">/mo</span></div>
+            </div>
+            <h2 class="text-2xl sm:text-3xl font-bold text-white mb-4">Healwright Team</h2>
+            <p class="text-slate-400 text-sm leading-relaxed mb-6">
+              Autonomous Playwright test healing engine over Model Context Protocol. Inspects failing DOM snapshots, correlates UI mutations, and regenerates stable, resilient locators directly within your IDE or local Claude environment.
+            </p>
+            <ul class="space-y-2 text-sm text-slate-300 font-mono mb-8">
+              <li class="flex items-center space-x-2">
+                <span class="text-emerald-400">✓</span>
+                <span>Deterministic Playwright trace & locator healing</span>
+              </li>
+              <li class="flex items-center space-x-2">
+                <span class="text-emerald-400">✓</span>
+                <span>Native FastMCP integration for Claude Desktop & Cursor</span>
+              </li>
+              <li class="flex items-center space-x-2">
+                <span class="text-emerald-400">✓</span>
+                <span>Hermetic runtime via PEP 517 wheels</span>
+              </li>
+            </ul>
+            <div class="flex flex-wrap items-center gap-4">
+              <a href="https://buy.stripe.com/cNi14o1yLgYj46R6ic5sA01" 
+                 target="_blank" 
+                 rel="noopener noreferrer"
+                 class="px-5 py-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold text-xs font-mono tracking-wide transition-all shadow-[0_0_15px_rgba(16,185,129,0.3)]">
+                Get Healwright Team
+              </a>
+              <a href="mailto:skildunne@awarselabs.com?subject=Healwright Support" class="text-xs font-semibold text-slate-300 hover:text-white">
+                Contact Engineering Support
+              </a>
+            </div>
+          </div>
+          <div class="w-full lg:max-w-md bg-slate-950 rounded-xl p-5 border border-white/10 font-mono text-xs text-slate-300 shadow-2xl">
+            <div class="flex items-center space-x-2 mb-4 text-slate-600 border-b border-white/5 pb-3">
+              <span class="h-2.5 w-2.5 rounded-full bg-red-500/80"></span>
+              <span class="h-2.5 w-2.5 rounded-full bg-yellow-500/80"></span>
+              <span class="h-2.5 w-2.5 rounded-full bg-emerald-500/80"></span>
+              <span class="ml-2 text-slate-500">healwright-agent.log</span>
+            </div>
+            <p class="text-slate-500 mb-2"># Detecting locator failure</p>
+            <p class="text-red-400 mb-1">FAIL: locator('button.submit-v1') not found</p>
+            <p class="text-slate-400 mb-2">Analyzing DOM diff snapshot...</p>
+            <p class="text-emerald-400">✓ Suggestion: getByRole('button', { name: 'Confirm Order' })</p>
+            <p class="text-slate-400 mt-2">Confidence: <span class="text-emerald-300 font-semibold">98.4%</span></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pricing Section Grid -->
+    <section id="pricing" class="mt-28 pt-10">
+      <div class="text-center max-w-2xl mx-auto mb-16">
+        <div class="text-xs font-mono uppercase tracking-widest text-emerald-400 mb-2">Simple Transparent Pricing</div>
+        <h3 class="text-3xl font-bold text-white mb-3">Instant Checkout & Ephemeral Licensing</h3>
+        <p class="text-slate-400 text-sm">Cancel anytime. All tools run 100% on-premise within your local perimeter.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+        <!-- SeatPrune Pro Card -->
+        <div class="glass-card rounded-2xl p-8 flex flex-col justify-between border border-white/10 hover:border-emerald-500/40 transition-all">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-xs font-mono uppercase tracking-wider text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">FinOps Agent</span>
+              <span class="text-xs text-slate-400 font-mono">Instant Access</span>
+            </div>
+            <h3 class="text-2xl font-bold text-white mb-2">SeatPrune Pro</h3>
+            <div class="text-3xl font-extrabold text-white font-mono mb-4">€19 <span class="text-sm font-normal text-slate-400">/mo</span></div>
+            <p class="text-slate-400 text-xs leading-relaxed mb-6">Automated GitHub & Copilot seat reclamation and FinOps governance.</p>
+            
+            <ul class="space-y-3 text-xs text-slate-300 font-mono mb-8">
+              <li class="flex items-center space-x-2">
+                <span class="text-emerald-400">✓</span>
+                <span>Unlimited GitHub & Copilot Org Audits</span>
+              </li>
+              <li class="flex items-center space-x-2">
+                <span class="text-emerald-400">✓</span>
+                <span>Protected Allowlist Governance</span>
+              </li>
+              <li class="flex items-center space-x-2">
+                <span class="text-emerald-400">✓</span>
+                <span>Slack Block Kit Check-in Alerts</span>
+              </li>
+              <li class="flex items-center space-x-2">
+                <span class="text-emerald-400">✓</span>
+                <span>FastMCP & Developer CLI Access</span>
+              </li>
+            </ul>
+          </div>
+
+          <a href="https://buy.stripe.com/5kQbJ2a5h7nJ0UF8qk5sA00" 
+             target="_blank" 
+             rel="noopener noreferrer"
+             class="w-full py-3 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-center text-xs uppercase font-mono tracking-wider transition-all shadow-[0_0_20px_rgba(16,185,129,0.25)]">
+            Audit GitHub Seats
+          </a>
+        </div>
+
+        <!-- Healwright Team Card -->
+        <div class="glass-card rounded-2xl p-8 flex flex-col justify-between border border-white/10 hover:border-emerald-500/40 transition-all">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-xs font-mono uppercase tracking-wider text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">QA Agent</span>
+              <span class="text-xs text-slate-400 font-mono">Popular</span>
+            </div>
+            <h3 class="text-2xl font-bold text-white mb-2">Healwright Team</h3>
+            <div class="text-3xl font-extrabold text-white font-mono mb-4">€29 <span class="text-sm font-normal text-slate-400">/mo</span></div>
+            <p class="text-slate-400 text-xs leading-relaxed mb-6">AI-powered self-healing engine for Playwright test suites.</p>
+
+            <ul class="space-y-3 text-xs text-slate-300 font-mono mb-8">
+              <li class="flex items-center space-x-2">
+                <span class="text-emerald-400">✓</span>
+                <span>Autonomous DOM Snapshot & Locator Healing</span>
+              </li>
+              <li class="flex items-center space-x-2">
+                <span class="text-emerald-400">✓</span>
+                <span>FastMCP Integration for Claude & Cursor</span>
+              </li>
+              <li class="flex items-center space-x-2">
+                <span class="text-emerald-400">✓</span>
+                <span>Interactive Patch Diff Generator</span>
+              </li>
+              <li class="flex items-center space-x-2">
+                <span class="text-emerald-400">✓</span>
+                <span>Headless Chromium Live Verification</span>
+              </li>
+            </ul>
+          </div>
+
+          <a href="https://buy.stripe.com/cNi14o1yLgYj46R6ic5sA01" 
+             target="_blank" 
+             rel="noopener noreferrer"
+             class="w-full py-3 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-center text-xs uppercase font-mono tracking-wider transition-all shadow-[0_0_20px_rgba(16,185,129,0.25)]">
+            Get Healwright Team
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Architecture / Trust Principles -->
+    <section class="mt-28">
+      <div class="text-center max-w-2xl mx-auto mb-16">
+        <h3 class="text-2xl font-bold text-white mb-3">Enterprise Architectural Guarantees</h3>
+        <p class="text-slate-400 text-sm">Designed from the ground up for strict corporate security perimeters.</p>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="glass-card p-6 rounded-xl">
+          <div class="text-emerald-400 text-lg mb-3">🔒</div>
+          <h4 class="text-white font-semibold text-sm mb-2">Zero Cloud Custody</h4>
+          <p class="text-slate-400 text-xs leading-relaxed">No intermediary proxies, tracking pixels, or external databases. Your code and secrets remain inside your local perimeter.</p>
+        </div>
+        <div class="glass-card p-6 rounded-xl">
+          <div class="text-emerald-400 text-lg mb-3">⚡</div>
+          <h4 class="text-white font-semibold text-sm mb-2">Ephemeral Execution</h4>
+          <p class="text-slate-400 text-xs leading-relaxed">Run on demand via <code class="text-slate-300">uvx</code> with zero system-wide pollution and zero daemon footprints left behind.</p>
+        </div>
+        <div class="glass-card p-6 rounded-xl">
+          <div class="text-emerald-400 text-lg mb-3">🛡️</div>
+          <h4 class="text-white font-semibold text-sm mb-2">GDPR & CCPA Compliant</h4>
+          <p class="text-slate-400 text-xs leading-relaxed">Because no personal data leaves your client boundary, Awarse Labs never acts as a Data Processor under Article 28.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-white/5 py-12 bg-slate-950/50">
+    <div class="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500">
+      <div>
+        © 2026 Awarse Labs. Dublin, Ireland. All rights reserved.
+      </div>
+      <div class="flex flex-wrap items-center gap-6 mt-4 sm:mt-0">
+        <a href="#pricing" class="hover:text-emerald-400 transition-colors">Pricing</a>
+        <a href="/security" class="hover:text-emerald-400 transition-colors">Enterprise Security</a>
+        <a href="https://billing.stripe.com/p/login/bpc_1UBygJKVTuotmD6yHc3yvvT5" target="_blank" rel="noopener noreferrer" class="text-neutral-400 hover:text-white transition-colors">Manage Subscription</a>
+        <a href="mailto:skildunne@awarselabs.com" class="hover:text-emerald-400 transition-colors">Support & Pilot Inquiries</a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
