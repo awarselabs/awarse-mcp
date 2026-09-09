@@ -1,0 +1,7 @@
+# Awarse Labs Documentation
+
+> Local-first AI developer tools for FinOps and Playwright QA automation.
+
+## Core Guides
+- [Playwright Self-Healing Locators](https://awarselabs.com/docs/healwright/playwright-self-healing-locators): Ephemeral locator remediation with FastMCP.
+- [SeatPrune Quickstart](https://awarselabs.com/docs/seatprune/quickstart): Automated M365 and GitHub license reclamation.
