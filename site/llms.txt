@@ -1,0 +1,13 @@
+# Awarse Labs
+
+> Local-first AI agents for FinOps and QA automation built on FastMCP.
+
+## Core Products & Capabilities
+- **awarse-mcp**: Self-healing browser automation server integrating Playwright with LLM-assisted locator repair.
+- **FastMCP Architecture**: Ephemeral, local-first execution eliminating SaaS overhead.
+- **Flaky Test Remediation**: Automated detection and healing of broken UI selectors in test pipelines.
+
+## Links & Repositories
+- Official Repository: https://github.com/awarselabs/awarse-mcp
+- Glama Registry: https://glama.ai/mcp/servers/awarselabs/awarse-mcp
+- Documentation: https://awarselabs.com/docs
