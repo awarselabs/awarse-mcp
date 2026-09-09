@@ -76,13 +76,17 @@ def scan_command(
     config: Annotated[Path | None, typer.Option("--config", "-c", help="Path to configuration YAML file")] = None,
     dry_run: Annotated[bool, typer.Option("--dry-run/--no-dry-run", help="Run in safety dry-run mode")] = True,
     threshold: Annotated[int | None, typer.Option("--threshold", "-t", help="Inactivity threshold in days")] = None,
+    format: Annotated[str, typer.Option("--format", "-f", help="Output format: table, markdown, json")] = "table",
 ):
     """Scans organization SaaS seats and prints zombie license analysis."""
     resolved_org, resolved_threshold, cfg_data = _load_config_and_resolve(config, org, threshold)
-    mode_str = " (dry-run)" if dry_run else ""
-    console.print(
-        f"[bold cyan]🔍 SeatPrune Audit Scan[/bold cyan] for organization [yellow]{resolved_org}[/yellow] (threshold={resolved_threshold} days){mode_str}..."
-    )
+    fmt = format.lower()
+
+    if fmt == "table":
+        mode_str = " (dry-run)" if dry_run else ""
+        console.print(
+            f"[bold cyan]🔍 SeatPrune Audit Scan[/bold cyan] for organization [yellow]{resolved_org}[/yellow] (threshold={resolved_threshold} days){mode_str}..."
+        )
 
     async def _scan():
         connector = GitHubConnector(org=resolved_org)
@@ -92,32 +96,80 @@ def scan_command(
         report = evaluator.evaluate_users(resolved_org, users)
         plan = evaluator.generate_reclamation_plan(resolved_org, users, dry_run=dry_run)
 
-        table = Table(title=f"SeatPrune Audit Results: {resolved_org}", border_style="cyan")
-        table.add_column("Username", style="bold white")
-        table.add_column("Seat Type", style="magenta")
-        table.add_column("Days Inactive", justify="right", style="yellow")
-        table.add_column("Monthly Cost", justify="right", style="green")
-        table.add_column("Status / Rationale", style="dim")
+        if fmt in ("markdown", "md"):
+            md_lines = [
+                f"# 🔍 SeatPrune FinOps Audit Scan: {resolved_org}",
+                f"**Inactivity Threshold:** {resolved_threshold} days | **Mode:** {'Dry-Run' if dry_run else 'Live'}\n",
+                "## Zombie / Reclaimable Seats",
+                "| Username | Seat Type | Days Inactive | Monthly Cost | Rationale |",
+                "| --- | --- | --- | --- | --- |",
+            ]
+            for target in plan.targets:
+                md_lines.append(
+                    f"| `{target.username}` | {target.seat_type.value} | {target.days_inactive} | ${target.monthly_cost:.2f} | {target.rationale} |"
+                )
+            if not plan.targets:
+                md_lines.append("| _None_ | _None_ | 0 | $0.00 | No zombie seats detected |")
 
-        for target in plan.targets:
-            table.add_row(
-                target.username,
-                target.seat_type.value,
-                str(target.days_inactive),
-                f"${target.monthly_cost:.2f}",
-                target.rationale,
+            md_lines.extend([
+                "",
+                "## 💰 FinOps Spend Summary",
+                f"- **Monthly Spend Recovery:** ${plan.total_monthly_savings:,.2f}/mo",
+                f"- **Annualized Spend Recovery:** ${plan.total_annual_savings:,.2f}/yr",
+                f"- **Zombie Seats Identified:** {len(plan.targets)} of {report.total_users} total users",
+            ])
+            print("\n".join(md_lines))
+
+        elif fmt == "json":
+            import json
+            out = {
+                "organization": resolved_org,
+                "threshold_days": resolved_threshold,
+                "dry_run": dry_run,
+                "total_users": report.total_users,
+                "zombie_seats": len(plan.targets),
+                "total_monthly_savings": plan.total_monthly_savings,
+                "total_annual_savings": plan.total_annual_savings,
+                "targets": [
+                    {
+                        "username": t.username,
+                        "seat_type": t.seat_type.value,
+                        "days_inactive": t.days_inactive,
+                        "monthly_cost": t.monthly_cost,
+                        "rationale": t.rationale,
+                    }
+                    for t in plan.targets
+                ],
+            }
+            print(json.dumps(out, indent=2))
+
+        else:
+            table = Table(title=f"SeatPrune Audit Results: {resolved_org}", border_style="cyan")
+            table.add_column("Username", style="bold white")
+            table.add_column("Seat Type", style="magenta")
+            table.add_column("Days Inactive", justify="right", style="yellow")
+            table.add_column("Monthly Cost", justify="right", style="green")
+            table.add_column("Status / Rationale", style="dim")
+
+            for target in plan.targets:
+                table.add_row(
+                    target.username,
+                    target.seat_type.value,
+                    str(target.days_inactive),
+                    f"${target.monthly_cost:.2f}",
+                    target.rationale,
+                )
+
+            console.print(table)
+
+            summary_panel = Panel(
+                f"[bold green]Monthly Spend Recovery:[/bold green] ${plan.total_monthly_savings:,.2f}/mo\n"
+                f"[bold green]Annualized Spend Recovery:[/bold green] ${plan.total_annual_savings:,.2f}/yr\n"
+                f"[bold yellow]Zombie Seats Identified:[/bold yellow] {len(plan.targets)} of {report.total_users} total users",
+                title="💰 FinOps Spend Summary",
+                border_style="green",
             )
-
-        console.print(table)
-
-        summary_panel = Panel(
-            f"[bold green]Monthly Spend Recovery:[/bold green] ${plan.total_monthly_savings:,.2f}/mo\n"
-            f"[bold green]Annualized Spend Recovery:[/bold green] ${plan.total_annual_savings:,.2f}/yr\n"
-            f"[bold yellow]Zombie Seats Identified:[/bold yellow] {len(plan.targets)} of {report.total_users} total users",
-            title="💰 FinOps Spend Summary",
-            border_style="green",
-        )
-        console.print(summary_panel)
+            console.print(summary_panel)
 
     asyncio.run(_scan())
 

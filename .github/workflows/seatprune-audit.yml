@@ -1,0 +1,24 @@
+name: FinOps SaaS Seat Audit
+
+on:
+  schedule:
+    - cron: '0 9 1 * *' # Runs on the 1st of every month at 09:00 UTC
+  workflow_dispatch:
+
+jobs:
+  audit-seats:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install SeatPrune
+        run: pip install seatprune
+      - name: Execute Audit
+        env:
+          GITHUB_TOKEN: ${{ secrets.ORG_ADMIN_TOKEN }}
+        run: |
+          seatprune scan --config seatprune.yaml --format markdown > report.md
+      - name: Log Findings
+        run: cat report.md

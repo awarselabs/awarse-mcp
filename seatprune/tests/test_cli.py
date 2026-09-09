@@ -54,3 +54,25 @@ providers:
     assert result.exit_code == 0
     assert "cli-override-org" in result.stdout
     assert "threshold=15 days" in result.stdout
+
+
+def test_scan_format_markdown(tmp_path: Path):
+    config_file = tmp_path / "test_seatprune.yaml"
+    config_file.write_text("version: '1'\nproviders:\n  github:\n    org: 'md-org'", encoding="utf-8")
+
+    result = runner.invoke(app, ["scan", "--config", str(config_file), "--format", "markdown"])
+    assert result.exit_code == 0
+    assert "# 🔍 SeatPrune FinOps Audit Scan: md-org" in result.stdout
+    assert "## Zombie / Reclaimable Seats" in result.stdout
+    assert "## 💰 FinOps Spend Summary" in result.stdout
+
+
+def test_scan_format_json(tmp_path: Path):
+    config_file = tmp_path / "test_seatprune.yaml"
+    config_file.write_text("version: '1'\nproviders:\n  github:\n    org: 'json-org'", encoding="utf-8")
+
+    result = runner.invoke(app, ["scan", "--config", str(config_file), "--format", "json"])
+    assert result.exit_code == 0
+    assert '"organization": "json-org"' in result.stdout
+    assert '"total_monthly_savings"' in result.stdout
+
