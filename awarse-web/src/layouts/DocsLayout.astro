@@ -1,0 +1,92 @@
+---
+interface Props {
+  title: string;
+  description: string;
+  keywords: string[];
+  slug: string;
+  lastModified: Date;
+}
+
+const { title, description, keywords, slug, lastModified } = Astro.props;
+const canonicalUrl = `https://awarselabs.com/docs/${slug}`;
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": title,
+  "description": description,
+  "url": canonicalUrl,
+  "dateModified": lastModified.toISOString(),
+  "author": {
+    "@type": "Organization",
+    "name": "Awarse Labs",
+    "url": "https://awarselabs.com"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Awarse Labs",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://awarselabs.com/favicon.svg"
+    }
+  },
+  "keywords": keywords.join(", ")
+};
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title} | Awarse Labs Docs</title>
+    <meta name="description" content={description} />
+    <meta name="keywords" content={keywords.join(', ')} />
+    <link rel="canonical" href={canonicalUrl} />
+
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:site_name" content="Awarse Labs Documentation" />
+
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  </head>
+  <body class="bg-slate-950 text-slate-100 antialiased selection:bg-cyan-500 selection:text-white">
+    <header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur sticky top-0 z-10 px-6 py-4 flex items-center justify-between">
+      <a href="/" class="text-xl font-bold tracking-tight text-white">Awarse<span class="text-cyan-400">Labs</span></a>
+      <nav class="flex items-center space-x-6 text-sm text-slate-400">
+        <a href="/docs" class="text-white hover:text-cyan-400 transition">Docs</a>
+        <a href="https://github.com/awarselabs/awarse-mcp" target="_blank" rel="noopener" class="hover:text-white transition">GitHub</a>
+      </nav>
+    </header>
+
+    <div class="max-w-7xl mx-auto flex min-h-[calc(100vh-73px)] px-4 py-8">
+      <aside class="w-64 border-r border-slate-800 pr-6 hidden md:block">
+        <div class="space-y-6 text-sm">
+          <div>
+            <h3 class="font-semibold text-white uppercase tracking-wider text-xs mb-3 text-slate-500">Healwright</h3>
+            <ul class="space-y-2 text-slate-400">
+              <li><a href="/docs/healwright/playwright-self-healing-locators" class="hover:text-cyan-400">Self-Healing Locators</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="font-semibold text-white uppercase tracking-wider text-xs mb-3 text-slate-500">SeatPrune</h3>
+            <ul class="space-y-2 text-slate-400">
+              <li><a href="/docs/seatprune/quickstart" class="hover:text-cyan-400">FinOps Setup</a></li>
+            </ul>
+          </div>
+        </div>
+      </aside>
+
+      <main class="flex-1 max-w-3xl pl-0 md:pl-10">
+        <article class="prose prose-invert prose-cyan max-w-none prose-pre:bg-slate-900 prose-pre:border prose-pre:border-slate-800">
+          <slot />
+        </article>
+      </main>
+    </div>
+  </body>
+</html>
