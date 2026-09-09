@@ -1,4 +1,6 @@
-# Healwright & SeatPrune MCP Servers
+# Healwright & SeatPrune MCP Servers — [Awarse Labs](https://awarselabs.com)
+
+> Local-first Model Context Protocol (MCP) tooling for enterprise engineering teams. [awarselabs.com](https://awarselabs.com)
 
 [![Smithery Badge](https://smithery.ai/badge/@skildunne/seatprune)](https://smithery.ai/servers/skildunne/seatprune)
 

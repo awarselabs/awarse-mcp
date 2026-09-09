@@ -1,0 +1,59 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "seatprune"
+version = "0.1.0"
+description = "FinOps agent and MCP server for reclaiming inactive GitHub seats and licenses."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "Proprietary" }
+authors = [
+    { name = "Sean Kildunne", email = "skildunne@awarselabs.com" }
+]
+keywords = ["github", "finops", "license-reclamation", "mcp", "fastmcp"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: System Administrators",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: System :: Systems Administration",
+]
+dependencies = [
+    "fastmcp>=0.1.0",
+    "httpx>=0.27.0",
+    "pydantic>=2.7.0",
+    "typer>=0.12.0",
+    "rich>=13.7.0",
+]
+
+[project.urls]
+Homepage = "https://awarselabs.com"
+Documentation = "https://awarselabs.com/docs/seatprune"
+Repository = "https://github.com/awarse-labs/seatprune"
+
+[project.scripts]
+seatprune = "seatprune.cli:app"
+seatprune-mcp = "seatprune.server:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/seatprune"]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3.0",
+    "pytest-asyncio>=0.25.0",
+    "respx>=0.22.0",
+    "ruff>=0.9.0",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
+[tool.ruff]
+src = ["src", "tests"]
+include = ["src/**/*.py", "tests/**/*.py"]
+

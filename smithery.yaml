@@ -1,3 +1,4 @@
+homepage: "https://awarselabs.com"
 startCommand:
   type: stdio
   configSchema:

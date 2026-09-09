@@ -1,5 +1,6 @@
 {
   "$schema": "https://glama.ai/mcp/schemas/server.json",
+  "homepage": "https://awarselabs.com",
   "maintainers": [
     "skildunne",
     "awarselabs"
