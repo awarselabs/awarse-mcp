@@ -1,0 +1,24 @@
+version: "1"
+thresholds:
+  inactive_days: 45
+  warning_lead_days: 7
+
+providers:
+  github:
+    org: "awarselabs"
+    token_env: "GITHUB_TOKEN"
+    audit_events:
+      - "commits"
+      - "issue_comments"
+      - "pull_requests"
+
+  slack:
+    token_env: "SLACK_ADMIN_TOKEN"
+    audit_channels: false # relies on workspace presence and message timestamps
+
+exemptions:
+  users:
+    - "admin-bot"
+    - "security-lead@awarselabs.com"
+  teams:
+    - "infra-maintainers"
