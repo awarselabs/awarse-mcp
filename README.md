@@ -1,3 +1,16 @@
+# Awarse MCP
+
+<p align="left">
+  <a href="https://pypi.org/project/healwright/"><img src="https://img.shields.io/pypi/v/healwright?color=06b6d4&label=healwright" alt="PyPI healwright" /></a>
+  <a href="https://pypi.org/project/seatprune/"><img src="https://img.shields.io/pypi/v/seatprune?color=06b6d4&label=seatprune" alt="PyPI seatprune" /></a>
+  <a href="https://github.com/awarselabs/awarse-mcp/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License" /></a>
+  <a href="https://awarselabs.com"><img src="https://img.shields.io/badge/docs-awarselabs.com-06b6d4.svg" alt="Docs" /></a>
+</p>
+
+> **Local-first Model Context Protocol (MCP) server & agents for Playwright QA self-healing and FinOps SaaS seat reclamation.**
+
+[Documentation](https://awarselabs.com/docs) • [Healwright Guide](https://awarselabs.com/docs/healwright/playwright-self-healing-locators) • [SeatPrune Guide](https://awarselabs.com/docs/seatprune/quickstart) • [Pro Editions](https://awarselabs.com/#pricing)
+
 # Healwright & SeatPrune MCP Servers — [Awarse Labs](https://awarselabs.com)
 
 > Local-first Model Context Protocol (MCP) tooling for enterprise engineering teams. [awarselabs.com](https://awarselabs.com)
