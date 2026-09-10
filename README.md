@@ -199,3 +199,6 @@ PYTHONPATH=. uv run pytest tests/
 Integrate Healwright into your test runners using the templates in `examples/` or the npm package `@healwright/fixture` / `npx healwright`:
 * **TypeScript Playwright Fixture**: See [examples/healwrightFixture.ts](examples/healwrightFixture.ts) (captures `ariaSnapshot`, parses the spec file stack trace, calls Healwright, and patches the file).
 * **Python Playwright pytest Fixture**: See [examples/healwright_locator.py](examples/healwright_locator.py).
+
+---
+⭐ If you find Awarse MCP useful for stabilizing your Playwright CI pipelines, consider giving us a star!
