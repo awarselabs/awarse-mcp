@@ -198,4 +198,31 @@ Integrate Healwright into your test runners using the templates in `examples/` o
 * **Python Playwright pytest Fixture**: See [examples/healwright_locator.py](examples/healwright_locator.py).
 
 ---
+
+## Open Source vs. Pro Editions
+
+Awarse Labs provides local-first, privacy-preserving developer tooling.
+
+| Capability | Community (CLI / OSS) | Pro Edition |
+| :--- | :---: | :---: |
+| **Healwright: Local FastMCP Locator Healing** | ✅ | ✅ |
+| **Zero DOM / Trace Egress** | ✅ | ✅ |
+| **SeatPrune: Dry-Run SaaS License Audits** | ✅ | ✅ |
+| **Pre-built FastMCP Binary Distributions** | — | ✅ Included |
+| **Automated CI/CD Test Branch Healing (PR bot)** | — | ✅ Included |
+| **Multi-Provider Connectors (GitHub, Slack, Jira)** | Basic CLI | ✅ Automated Action |
+| **Commercial SLA & Priority Locator Heuristics** | — | ✅ Included |
+
+👉 Compare plans and activate licenses at **[awarselabs.com/#pricing](https://awarselabs.com/#pricing)**.
+
+---
+
+### Licensing & Legal
+
+Core packages are licensed under the [MIT License](LICENSE).  
+Commercial subscriptions and Pro features are operated by **Awarse Labs** (CRO Business Name Registration No. 793328, Ireland).  
+For enterprise support or custom FastMCP integration inquiries: [support@awarselabs.com](mailto:support@awarselabs.com).
+
+---
 ⭐ If you find Awarse MCP useful for stabilizing your Playwright CI pipelines, consider giving us a star!
+
